@@ -1,0 +1,230 @@
+{{set . "title" "Paths"}}
+{{template "dheader.html" .}}
+
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Resources</a></li>
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+  <!-- Target list -->
+  <div id="tab1" class="col s12">
+
+    <!-- Table -->
+    <div class="row">
+      <div class="col s12 m8 offset-m2">
+        <ul class="collection with-header">
+            <li class="collection-header"><h4>Resources
+                <a id="show_modal" href="#" class="secondary-content" title="New Resource">
+                        <i class="material-icons">add_circle_outline</i></a></h4>
+            </li>
+            <div>
+                <a class="medium-tab" style="padding-left:100px;">Name</a>
+                <a class="small-tab" style="padding-left:50px;"></a>
+                <a class="target-response">URL name</a>
+                <a class="secondary-content">Actions</a>
+                <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+            </div>
+          </li>
+        <!--Select of games-->
+          {{range $m := .AppPaths }}
+
+            <li class="collection-item">
+                
+                <!--<img src="http://allswalls.com/images/ariel-rebel-adult-model-women-females-girls-sexy-babes-d-wallpaper-1.jpg" alt="" class="circle">-->
+                {{if eq $m.Status.Name "init" }}
+                  <a href="#" class="active-target" data-id="{{$m.ID.Hex}}"><i class="material-icons">info</i></a>
+                {{end}}
+                {{if eq $m.Status.Name "active" }}
+                  <a href="#"><i class="material-icons small-tab" style="padding-left:50px;">check</i></a>
+                {{end}}
+                {{if eq $m.Status.Name "inactive"}}
+                  <a href="#"><i class="material-icons">close</i></a>
+                {{end}}
+                <a>{{$m.Name}}</a>
+                <a class="small-tab" style="padding-left:50px;"></a>
+                <a class="target-response">{{$m.Name}}</a>
+                <a class="del-target secondary-content" data-id="{{$m.ID.Hex}}" href="#"><i class="material-icons">close</i></a>
+                <a class="edit-target secondary-content" data-id="{{$m.ID.Hex}}" href="#"><i class="material-icons">edit</i></a>
+                <a class="secondary-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <!--<a href="webgames/{{$m.ID.Hex}}" class="secondary-content"><i class="material-icons">send</i></a>-->
+                <div>
+                </div>
+            </li>
+
+          {{end}}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Game form -->
+  <div id="modal1" class="modal modal-fixed-footer">
+    <form id="main_form" class="col s12 m12" action="app_paths" method="post" enctype="multipart/form-data">
+        <input type="hidden" id="idResource" />
+        <div class="row">
+            <div class="row">
+                <div class="input-field col s12 m6">
+                    <input id="name" type="text" class="validate" name="name" required>
+                    <label for="name">Name</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <input id="section" type="text" class="validate" name="section" required>
+                    <label for="section">Section</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m12">
+                    <input id="url" type="text" class="validate" name="url" required>
+                    <label for="url">URL</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m12">
+                    <input id="enviroment" type="text" class="validate" name="enviroment" required>
+                    <label for="enviroment">Enviroment</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+            <button id="submit" class="btn waves-effect waves-light" type="" name="submit">Send
+            <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </form>
+    </div>
+    
+</div>
+
+<div class="JS_main" style="display:none">
+    <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+  </div>
+
+<script>
+    var views = {
+      option: "<option value='$.value' d-type='$.type' >$.name</option>",
+
+      row_target :  '<li class="collection-item row-subs"><div><a href="#">$.email</a>'+
+                    '<a href="#" class="del-target secondary-content create-winner" data-gid="$.gID" data-sid="$.subID"><i class="material-icons">check</i></a>'+
+                    '<a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>'+
+                    '<a href="#" class="secondary-content">$.score</a>'+
+                    '</div></li>'
+  };
+
+  var 
+  table_body = $(".collection-item.no-info").css({"display":"none"}),
+  _filter_mission = $("#form_r_mission"),
+  _form_resources = $("#modal1 form"),
+  _modal_detail_game = $("#modal1"),
+  _id_resource = $("#idResource");
+
+  $(document).ready(function(){
+
+        function fillFormDetail(model){
+            _form_resources.find("#name").val(model!=""?model.name:""),
+            _form_resources.find("#section").val(model!=""?model.section:"");
+            _form_resources.find("#url").val(model!=""?model.url:"")
+            _form_resources.find("#enviroment").val(model!=""?model.enviroment:"")
+        };
+
+        // Hanlde select change event (currently materialize doesn't work well)
+        $(".select-wrapper li").on("click", function () {
+            var text = "";
+            text = $(this).find("span").text();
+            var selectType = $(this).parent().siblings("select");
+            selectType.find("option").prop("selected", false);
+            selectType.find('option:contains(' + text + ')').prop("selected", true);
+        });
+
+        // Hadle show Question modal
+        $("#show_modal").on("click",function(){
+            _form_resources.prop("method","POST")
+            fillFormDetail("");
+            setFormFields("new");
+            $("#modal1").modal("open");
+        });
+    
+        // Edit resource click
+        $(".edit-target").on("click", function () {
+
+            var 
+            id = $(this).attr("data-id"),
+            param = {"format":"json"};
+
+            _form_resources.prop("method","PATCH")
+            _id_resource.val(id)
+            
+            // Send object to endpoint
+            $.ajax({
+                url: _form_resources.prop("action")+"/"+id,
+                method: "get",
+                data: param,
+                beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+
+                success: function (resp) {
+                    if (resp.success)
+                    fillFormDetail(resp.data),
+                    _modal_detail_game.modal("open");
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+        //Handle delete function
+        $(".del-target").on("click", function () {
+            var id = $(this).attr("data-id");
+
+            $.ajax({
+                url: "webgames/" + id,
+                method: "delete",
+                success: function (result) {
+                    alert(result.message);
+                    //$("#modal_question_detail").modal("close");
+                    location.reload();
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+        $("#submit").on("click", function () {
+            
+            // Send object to endpoint
+            $.ajax({
+                url: _form_resources.prop("method")=="get"?_form_resources.prop("action")+"/"+_id_resource.val():_form_resources.prop("action"),
+                method: _form_resources.prop("method")=="get"?"patch":"post",
+                data: _form_resources.serialize(),
+                beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+                success: function (resp) {
+                    location.reload()
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+            return false;
+        });
+
+        function setFormFields(type){
+            _form_resources.find(".selects").css({display:type=="new"?"block":"none"}),
+            _form_resources.find(".cover_pic").css({display:type=="new"?"block":"none"})
+        }
+
+  });
+
+
+</script>
+
+{{template "dfooter.html" .}}

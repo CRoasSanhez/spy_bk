@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>{{.title}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/public/css/materialize.min.css">
+    <link rel="shortcut icon" type="image/png" href="/public/img/favicon.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/public/js/jquery-2.2.4.min.js"></script>
+    <script src="/public/js/materialize.min.js"></script>
+    {{range .moreStyles}}
+      <link rel="stylesheet" type="text/css" href="/public/{{.}}">
+    {{end}}
+    {{range .moreScripts}}
+      <script src="/public/{{.}}" type="text/javascript" charset="utf-8"></script>
+    {{end}}
+    <script>
+      $(document).ready(function(){
+        $(".menu").sideNav();
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo center">Spychatter</a>
+          <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li><a href="#" data-activates="slide-out" class="menu"><i class="material-icons">menu</i></a></li>
+          </ul>
+        </div>
+      </nav>
+
+      {{if .user}}
+        <ul id="slide-out" class="side-nav">
+          <li><div class="user-view">
+            <div class="background">
+              <img src="{{.user.Attachment.URL}}">
+            </div>
+            <a href="#"><span class="white-text name">{{.user.PersonalData.FirstName}} {{.user.PersonalData.LastName}}</span></a>
+            <a href="#"><span class="white-text email">{{.user.Email}}</span></a>
+          </div></li>
+          <li><a class="waves-effect" href="/spyc_admin/cashhunt">Simple Cash Hunt</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/missions?page=1&quantity=10">Misiones</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/rewards">Rewards</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/validation">Target Validation</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/webgames">Games</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/sp">Sponsors</a></li>
+          <li><a class="waves-effect" href="{{url "DUsersController.Index"}}?page=1&quantity=10">Usuarios</a></li>
+          <li><a class="waves-effect" href="/spyc_admin/app_paths">Routes</a></li>
+          <li><div class="divider"></div></li>
+          <li><a class="waves-effect" href="/spyc_admin/logout">Salir</a></li>
+        </ul>
+      {{end}}
+    </header>

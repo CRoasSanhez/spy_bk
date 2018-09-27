@@ -1,0 +1,251 @@
+{{set . "title" "Target Detail"}} {{template "dheader.html" .}}
+<div class ="row">
+    
+</div>
+<div class="row">
+    <div class="col s12 m6 offset-m3">
+        <div class="label">
+            <h4>Target Details</h4>
+        </div>
+            <input type="hidden" name="_token" value="">
+            <div class="form-group">
+                <div class="controls">
+                    <label for="title">Name</label>
+                    {{range $k, $v := .Mission.Title}}
+                    <input id="title" type="text" class="form-control" name="title" value="{{$k}} - {{$v}}" disabled>
+                    {{end}}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="controls">
+                    <label for="desription">Description</label>
+                    {{range $k, $v := .Target.Description}}
+                    <input id="desription" type="text" class="form-control" name="desription" value="{{$k}} - {{$v}}" disabled>
+                    {{end}}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="controls">
+                    <label for="desription">URL</label>
+                    <input id="desription" type="text" class="form-control" name="desription" value="{{.Target.WebURL}}" disabled>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="controls">
+                    <label for="desription">Target Type</label>
+                    <input id="desription" type="text" class="form-control" name="desription" value="{{.Target.Type}}" disabled>
+                </div>
+            </div>
+
+            {{if eq .Target.Type "options"}}
+                <div class="row">
+                    <div class="col s12 m12">
+                        <ul class="collection with-header">
+                        <li class="collection-header"><h5>Questions<a id="show_q_modal" href="#" data-target="#modal_question_detail" class="secondary-content" data-toggle="modal" ><i class="material-icons">add</i></a></h5></li>
+                            {{range $q := .Questions }}
+                                <li class="collection-item"><div><a href="">{{$q.Title}}</a><a href="" class="secondary-content"><i class="material-icons">send</i></a></div></li>
+                            {{end}}
+                        </ul>
+                    </div>
+                </div>
+            {{end}}
+    </div>
+</div>
+
+{{if eq .Target.Type "options"}}
+<!-- Modal Question -->
+<div id="modal_question_detail" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <h4>Question</h4>
+            <form class="form-horizontal form--flex" role="form" method="POST" action="../targets/c/{{.Mission.ID.Hex}}" enctype="multipart/form-data">
+
+                <div class="row">
+                    <div class="input-field col s12 m12">
+                        <label for="q_name">Name</label>
+                        <input id="q_name" type="text" class="form-control" name="name" required="true">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="wrapper-form-opt input-field col s12 m12">
+                        <h4>Options</h4>
+                        <form id="form-options" class="form-horizontal form--flex" role="form" method="" action="#">
+                            <div class="row">
+                                <div class="input-field col s10 m10">
+                                    <label for="name">Option 1</label>
+                                    <input id="option_value_1" data-id="1" type="text" class="txt-option form-control" name="value" required="true">
+                                </div>
+                                <div class="col s2 m2 form-check">
+                                    <p><input type="checkbox"  id="op1"/><label class="l-check" for="op1">Answer?</label></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s10 m10">
+                                    <label for="name">Option 2</label>
+                                    <input id="option_value_2" data-id="2" type="text" class="txt-option form-control" name="value" required="true">
+                                </div>
+                                <div class="col s2 m2 form-check">
+                                    <p><input type="checkbox"  id="op2"/><label class="l-check" for="op2">Answer?</label></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s10 m10">
+                                    <label for="name">Option 3</label>
+                                    <input id="option_value_3" data-id="3" type="text" class="txt-option form-control" name="value" required="true">
+                                    
+                                </div>
+                                <div class="col s2 m2 form-check">
+                                    <p><input type="checkbox" id="op3"/><label class="l-check" for="op3">Answer?</label></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s10 m10">
+                                    <label for="name">Option 4</label>
+                                    <input id="option_value_4" data-id="4" type="text" class="txt-option form-control" name="title" required="true">
+                                    
+                                </div>
+                                <div class="col s2 m2 form-check">
+                                    <p><input type="checkbox" id="op4"/><label class="l-check" for="op4">Answer?</label></p>
+                                </div>
+                            </div>
+                        </form>
+                        <!--
+                        <ul class="collection with-header">
+                            <li class="collection-header"><h4>Options<a id="show_o_modal" href="#modal_option_detail" data-target="#modal_option_detail" class="secondary-content" data-toggle="modal" ><i class="material-icons">add</i></a></h4></li>
+
+                            <li class="collection-item ">
+                                
+                                <div>
+                                    <a href="#">Value</a>
+                                    <a href="#" class="secondary-content"><i class="material-icons">close</i></a>
+                                    <a href="#" class="secondary-content"><i class="material-icons">edit</i></a>
+                                </div>
+                                
+                            </li>
+                        </ul>
+                        -->
+                    </div>
+                </div>
+                <div class="row">
+                    <button id="save_question" class="btn waves-effect waves-light" type="" name="submit">Send
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{if eq .Target.Type "qr"}}
+
+<div class="row">
+    <div class="col s12 m6 offset-m3">
+        <a class="get-qr waves-effect waves-light btn">Get-QR</a>
+    </div>
+    <div class="col s12 m6 offset-m3" style="text-align:center;">
+        <img id="qr-image" src="" />
+    </div>
+    
+</div>
+{{end}}
+
+<div class="JS_main" style="display:none">
+  <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+</div>
+
+<script>
+
+    var _options_cehcks = $(".form-check");
+    var options =[], option = {};
+
+    $(document).ready(function(){
+
+    });
+
+    // Hadle show Question modal
+    $("#show_q_modal").on("click",function(){
+        $("#modal_question_detail").modal("open");
+    });
+
+    // Hadle show Options modal
+    $("#show_o_modal").on("click",function(){
+        $("#modal_option_detail").modal("open");
+    });
+
+    // Handle option form checks
+    $(".form-check").on("click",function(){
+        _options_cehcks.find("input").prop("checked",false);
+        $(this).find("input:checkbox").prop("checked",true)
+    });
+
+    // Handle save Question
+    $("#save_question").on("click",function(){
+        question ={};
+
+        //save options to question
+        var i=0;
+        _options_cehcks.each(function(){
+            i++;
+            var in_text = $(this).parent().find("input:text");
+
+            option = {
+                id : parseInt($(".wrapper-form-opt").find("[data-id='"+i+"']").attr("data-id")),
+                value : $(".wrapper-form-opt").find("[data-id='"+i+"']").val(),
+                isAnswer : $(this).find("input:checkbox").is(':checked') ? true:false
+                };
+
+            options.push(option)
+        });
+
+        // create Question object
+        question = {
+            title: $("#q_name").val(),
+            options : options
+        };
+
+        // Send object to endpoint
+        $.ajax({
+            url: "../questions/{{.Target.ID.Hex}}", 
+            contentType:"application/json",
+            method:"post",
+            data: JSON.stringify(question),
+            success: function(result){
+                alert(result);
+                 //$("#modal_question_detail").modal("close");
+                 location.reload();
+            },
+            error: function(err) {
+                alert(err)
+            } ,
+        }); // end ajax
+
+    }); // end save_question click
+    
+    // Handle get QR request
+    $(".get-qr").on("click",function(){
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', "../targets/qr/{{.Target.ID.Hex}}", true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function(e) {
+            if (this.status == 200) {
+                
+                var reader = new window.FileReader();
+                reader.readAsDataURL(this.response); 
+                reader.onloadend = function() {
+                    base64data = reader.result;                
+                    console.log(base64data );
+                    document.getElementById("qr-image").src = base64data;
+                }
+            }
+        };
+        xhr.send();
+    }); // end get-QR
+
+</script>
+
+
+{{template "dfooter.html" .}}

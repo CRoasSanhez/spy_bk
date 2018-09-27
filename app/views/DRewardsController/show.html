@@ -1,0 +1,44 @@
+{{set . "title" "Reward Detail"}} {{template "dheader.html" .}}
+<div class="row">
+    <div class="col s12 m6 offset-m3">
+    <div class="label">
+            <h4>Reward Detail</h4>
+        </div>
+    <div class="row">
+        <div class="input-field col s12 m8">
+            <input id="title" type="text" name="name" disabled value="{{.Reward.Name}}">
+            <label for="title">Name</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12">
+            <textarea id="description" class="materialize-textarea" name="description" disabled>{{.Reward.Description}}</textarea>
+            <label for="description">Descripcion</label>
+        </div>
+    </div>
+    <!--Select of Resources for reward-->
+    <div class="row">
+        <!--Select of MIssions-->
+        <div class="input-field col s6 m6">
+            <input id="mission" type="text"  name="name" disabled value="{{.Reward.ResourceID}}">
+            <label for="mission">Mission</label>
+        </div>
+        <!--Select of Targets from Mission-->
+        <div class="input-field col s6 m6">
+            <input id="target" type="text" name="name" disabled value="{{.Reward.ResourceType}}">
+            <label for="target">Target</label>
+        </div>
+    </div> 
+    <div class="row">
+        <img class="materialboxed" width="650" src="">
+    </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('.materialboxed').materialbox();
+  });
+</script>
+
+{{template "dfooter.html" .}}

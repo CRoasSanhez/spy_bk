@@ -1,0 +1,31 @@
+{{set . "title" "Users"}}
+{{template "dheader.html" .}}
+
+<div class="row">
+  <div class="col s12 m6 offset-m3">
+    <ul class="collection with-header">
+      <li class="collection-header"><h4>Usuarios</h4></li>
+      {{range $u := .Users }}
+          <li class="collection-item"><div><a href="users/{{$u.ID.Hex}}">{{$u.Email}}</a><a href="users/{{$u.ID.Hex}}" class="secondary-content"><i class="material-icons">send</i></a></div></li>
+      {{end}}
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col s12 m6 offset-m3">
+    <ul class="pagination" style="text-align: center;">
+      <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+      {{range $k, $_ := N .Pages }}
+        <li class="{{if eq $k $.CurrentPage}}active{{end}}"><a href="users?page={{add $k 1}}">{{add $k 1}}</a></li>
+      {{end}}
+      <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+</div>
+
+{{template "dfooter.html" .}}

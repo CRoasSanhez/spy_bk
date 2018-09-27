@@ -1,0 +1,22 @@
+
+###...ANSWERS...###
+answer.success=You had a success answer
+answer.wrong=You had a wrong answer
+
+###...CASHHUNT...###
+cashhunt.finished=Cash Hunt "%s" finished
+cashhunt.new=New CashHunt "%s". Come and join us
+cashhunt.newNotYourCountry=New CashHunt "%s". Aavailable only for "%s"
+cashhunt.newTitle=New Cash Hunt
+
+
+###...MISSIONS...###
+mission.complete=The mission "%s" has been completed
+mission.completeTitle=Mission Complete
+
+###...REWARDS...###
+reward.obtained=Reward obtained
+reward.notObtained=We're so sorry, all rewards were already obtained. Good luck
+
+###...TARGETS...###
+target.nextTarget=Complete the next target

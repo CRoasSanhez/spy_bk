@@ -1,0 +1,119 @@
+
+###...GENERICS...###
+###..........###
+# Not Found
+# Example: User 59826b02e7f4f81305c2c4ce Not Found
+error.notFound=%s %s not found
+
+# Internal Error
+error.internalError=Internal error
+
+# Bad Request
+error.badRequest=Bad request
+
+# Forbidden
+error.forbidden=You need permissions to access
+
+# Inactive
+# Example: User currently inactive
+error.inactive=%s currently inactive
+
+# Invalid
+error.invalid=invalid %s
+
+# Creating
+# Example: Error creating USER
+error.create=Error creating %s
+
+# Updating
+# Example: Error updating USER
+error.update=Error updating %s
+
+# Deleting
+# Example: Error deleting USER
+error.delete=Error deleting %s
+
+# Retreiving
+# Example: Error retreiving USER
+error.retreive=Error retreiving %s
+
+
+###...FILES...###
+###..........###
+# Uploading
+# Example1: Error uploading PROFILE PICTURE 
+# Example2: Error uploading CHEST FILE
+error.upload=Error uploading %s %s
+
+# Downloading
+# Example1: Error downloading PROFILE PICTURE 
+# Example2: Error downloading CHEST FILE
+error.downloading=Error downloading %s %s
+
+# Empty
+# error.emptyFile=Empty %s
+
+
+###...INVITES...###
+###..........###
+# Inviting/Adding friends
+# Example: Error INVITING friend
+error.invitation=Error %s friend
+
+
+###...INCOMPATIBILITY...###
+###..........###
+# Log In
+error.logIN=User or password invalid
+
+
+###...SUBSCRIPTIONS...###
+###..........###
+# Subscription
+# Example: TARGET Subscription error
+error.subscription=%s subscription error
+
+# Unsubscription
+# Example: TARGET Unsubscription error
+error.unsubscription=%s unsubscription error
+
+# Not Subscribed
+# Example: You are ... to MISSION/TARGET
+error.notSubscribed=You are not subscribed to %s
+
+# Wrong answer
+error.wrongAnswer=Wrong answer
+
+# Not Allowed
+error.notAllowed=Not allowed to %s
+
+
+###...MAX/MIN...###
+###..........###
+# Max number reached
+# Example: Max SUBSCRIPTIONS/INTENTS reached
+error.maxReached=Max %s reached
+
+# Min Length
+error.minLength=Min length is %s
+
+###...AVAILABILITY...###
+###..................###
+# Not Available
+error.notAvailable=No %s available
+
+###...GENERATING...###
+###................###
+# Example: Error generating new TOKEN
+error.generateNew=Error generating new %s
+
+###...REWARDS...###
+###.............###
+error.obtained=Reward already obtained
+
+
+###...UNEXPECTED...###
+###..........###
+error.unexpected=Unexpected Error
+
+sms.verification=SpyChatter account verification code. spycode:%s

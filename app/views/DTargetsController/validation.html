@@ -1,0 +1,301 @@
+{{set . "title" "Validate Response"}}
+{{template "dheader.html" .}}
+<style>
+    .target-response{
+        font-size: x-large;
+    }
+</style>
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Targets</a></li>
+      <!--<li class="tab col s3"><a id="t2" href="#tab2">Target Detail</a></li>-->
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+  <!-- Target list -->
+  <div id="tab1" class="col s12">
+
+    <!-- Filter -->
+    <div class="row col s12 m10 offset-m1">
+        <!--Select of Countries-->
+          <div class="input-field col s6 m3">
+              <select id="form_r_country" class="form-resource target" name="country">
+                  {{range $m := .Countries}}
+                      <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                  {{end}}
+              </select>
+              <label for="desription">Country</label>
+          </div>
+          <!-- Select of Campaigns -->
+        <div class="input-field col s6 m3">
+                <select id="filter_campaign" class="form-resource target" name="campaign">
+                    {{range $m := .Campaigns}}
+                        <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                    {{end}}
+                </select>
+                <label for="campaign">Campaign</label>
+            </div>
+          <!--Select of Missions-->
+          <div class="input-field col s6 m3">
+              <select id="form_r_mission" class="form-resource target" name="country">
+                    <option value="" disabled>Select</option>
+              </select>
+              <label for="desription">Mission</label>
+          </div>
+          <!--Select of Target Types-->
+        <div class="input-field col s6 m2">
+            <select class="form_type" name="type">
+                    <option value="" disabled>Select</option>
+            </select>
+            <label for="desription">Type</label>
+        </div>
+         <!--Select of Status Types-->
+        <div class="input-field col s6 m3">
+            <select id="form_r_target" class="form-resource target" name="resource_id">
+                <option value="" disabled>Select</option>
+            </select>
+            <label for="desription">Target</label>
+        </div>
+        <div class="col s6 m2">
+            <button id="filter_submit" class="btn waves-effect waves-light" type="" name="submit">Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="row">
+      <div class="col s12 m8 offset-m2">
+          <h5>Select the correct answer by clicking on the check.</h5>
+          <h6 class="target-description"><strong>Instructions: </strong></h6>
+        <ul class="collection with-header">
+          <li class="collection-item header">
+            <div>
+                <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <a>Email</a>
+                <a class="table-space" style="padding-left:120px;"></a>
+                <a class="target-response">Target_Response</a>
+                <a class="secondary-content">Validate</a>
+                <a class="secondary-content response-tag" style="padding-right: 45px;">Response</a>
+            </div>
+          </li>
+            <li class="collection-item no-info">
+                <div>
+                    <a href="#">There is no information todisplay</a></br>
+                </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Structure -->
+    <div id="modal_detail" class="modal modal-fixed-footer" style="height:auto">
+            <div class="col s12 m12">
+                <div class="card">
+                    <div class="card-image">
+                        <img src="" alt="" class="image_zoom">
+                        <!--<span class="card-title">Card Title</span>-->
+                    </div>
+                </div>
+            </div>
+    </div>
+
+</div>
+
+<div class="JS_main" style="display:none">
+  <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+</div>
+
+<script>
+    var views = {
+        option: "<option value='$.value' d-type='$.type' >$.name</option>",
+        row_target :  '<li class="collection-item row-subs"><div><a href="#">$.email</a><a style="padding-left:3%">$.completed_at</a>'+
+                    '<a href="#" class="del-target secondary-content validate valid" data-gid="$.gID" data-sid="$.subID"><i class="material-icons">check</i></a>'+
+                    '<a href="#" class="del-target secondary-content validate invalid" data-gid="$.gID" data-sid="$.subID" style="padding-right:30px;"><i class="material-icons">close</i></a>'+
+                    '<a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>'+
+                    '<a href="#" class="secondary-content">$.score</a>'+
+                    '</div></li>',
+        row_target_photo:'<li class="row-subs collection-item avatar" style="padding-left:30px">'+
+                    '<img src="$.image_url" alt="" class="circle" style="width:70px;height:70px;left:300px">'+
+                    '<span class="title">$.email</span><p>$.email<br> Second Line </p>'+
+                    '<a href="#" class="del-target secondary-content validate valid" data-gid="$.gID" data-sid="$.subID" style="padding-right:30px;"><i class="material-icons">check</i></a>'+
+                    '<a href="#" class="del-target secondary-content validate invalid" data-gid="$.gID" data-sid="$.subID"><i class="material-icons">close</i></a>'+
+                    '</li>'
+  };
+
+  var table_body = $(".collection-item.no-info").css({"display":"none"}),
+  _filter_submit = $("#filter_submit"),
+  _filter_mission = $("#form_r_mission"),
+  _modal_detail = $("#modal_detail"),
+  _select_targets = $("#form_r_target");
+
+  $(document).ready(function(){
+
+    $(".form_type").parent().remove();
+    $("#form_r_country").parent().parent().remove()
+
+    // Handle campaign select
+    $("#filter_campaign").on("change",function(){
+        var id = $(this).val();
+        $.ajax({
+            url: "missions/campaign/" + id,
+            method: "get",
+            beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+                },
+            success: function (result) {
+                if (result.data.length>0){
+                    _filter_mission.fillValues({datas:filterDataFilters(result.data,"campaign")})
+                    _filter_mission.material_select("update");
+                    _filter_mission.trigger("change",id)
+                }
+            },
+            error: function (err) {
+                alert(err.responseText)
+            },
+        }); // end ajax
+    });
+
+    // Get Targets by MIission
+    $("#form_r_mission").on("change",function(){
+        var id = $(this).val();
+        $.ajax({
+            url: "targets/game/" + id,
+            method: "get",
+            success: function (result) {
+                if (result.data.length>0){
+                    _select_targets.empty().append(fillSelect(views.option, result.data)).material_select("update");
+                    _select_targets.trigger("change",id)
+                }
+            },
+            error: function (err) {
+                alert(err.responseText)
+            },
+        }); // end ajax
+    });
+
+    // Get Subscriptions by target
+    _filter_submit.on("click",function(){
+        var id =_select_targets.val();
+        $.ajax({
+            url: "validation/" + id,
+            method: "get",
+            beforeSend: function(request) {
+                request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+            },
+            success: function (result) {
+                if (result.data.length>0){
+                    var newArr =  ParseDatesArray(result.data,"completed_at")
+                    $(".row-subs").remove();                    
+                    $(".collection-item.header").parent().append(fillViews(result.data[0].user_score?views.row_target:views.row_target_photo, newArr));
+                    $(".target-description").html("Instructions: "+ result.data[0].description)
+                    $(".target-response").html("Target Response: <strong>"+result.data[0].step_score+"</strong>")
+                    tableListener();
+                }else{
+                    $(".row-subs").remove()
+                }
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Handles the table events
+    var tableListener = function(){
+
+        // Handle validate click
+        $(".validate").on("click",function(){
+            var idGame = $(this).attr("data-gid");
+            var idSubs = $(this).attr("data-sid");
+            var 
+            obj = {status: $(this).hasClass("valid")?"success":"error", data: $(this).hasClass("valid")?"success":"error"},
+            row = $(this);
+
+
+            $.ajax({
+                url: "validation/"+idGame+"/"+idSubs,
+                method: "post",
+                contentType: "application/json",
+                data: JSON.stringify(obj),
+                beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+                },
+                success: function (result) {
+                    if (result.success){
+                        row.closest("li").remove()
+                    }
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        }); // end function
+
+        $(".circle").on("click",function(){
+            _modal_detail.find(".image_zoom").attr("src", $(this).attr("src"));
+            _modal_detail.modal("open");
+        });
+    };
+    
+  });
+
+function filterDataFilters(data,type){
+    var resArr = [];
+    if (data.length){
+        switch(type){
+            case "campaign":
+            
+            for(var i =0; i<data.length; i++){
+                resArr[i] = {"id":data[i].id, "selected": false, "value": data[i].title}
+            }
+            break;
+            case "mission":
+            break;
+            case "target":
+            break;
+            default:
+        }
+    }
+    
+    return resArr;
+}
+
+function fillViews(view, arr){
+    var result="";
+
+    for (var i=0;i<arr.length;i++){
+        result += view.replace("$.gID", _filter_mission.val())
+                    .replace("$.gID", _filter_mission.val())
+                    //.replace("$.name", arr[i]["user_name"])
+                    .replace("$.email", arr[i]["email"])
+                    .replace("$.completed_at", arr[i]["completed_at"])
+                    .replace("$.subID", arr[i]["id"])
+                    .replace("$.subID", arr[i]["id"])
+                    .replace("$.score", arr[i]["user_score"])
+                    .replace("$.image_url",arr[i]["response_image"].file_url);
+    }
+    return result;
+}
+
+function fillSelect(view, arr){
+    var result="";
+    for(var i=0;i<arr.length;i++){
+        result += view.replace("$.value", arr[i]["id"])
+                        .replace("$.name", arr[i]["name"])
+                        .replace("$.type", arr[i]["type"]);
+    }
+    return result;
+}
+
+
+</script>
+
+{{template "dfooter.html" .}}

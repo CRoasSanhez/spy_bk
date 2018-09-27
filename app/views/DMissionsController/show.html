@@ -1,0 +1,549 @@
+{{set . "title" "Mission Detail"}} {{template "dheader.html" .}}
+<style>
+    .collection-item.targets{
+        border-width: 1px !important;
+        border-style: inherit;
+        border-color: lightgray
+    }
+</style>
+<div class="row">
+    <div class="col s12 m8 offset-m2">
+        <div class="label">
+            <h4>Mission Details</h4>
+        </div>
+        <input type="hidden" name="_token" value="">
+        <div class="form-group">
+            <div class="controls">
+                <label for="title">Title</label>
+                {{range $k, $v := .Mission.Title}}
+                <input id="title" type="text" class="form-control" name="title" value="{{$k}} - {{$v}}" disabled>
+                {{end}}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="controls">
+                <label for="desription">Description</label>
+                {{range $k, $v := .Mission.Description}}
+                <input id="desription" type="text" class="form-control" name="desription" value="{{$k}} - {{$v}}" disabled>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12 m12">
+                <ul class="collection with-header">
+                    <li class="collection-header">
+                        <h4>Targets
+                            <a href="#" class="update-order secondary-content" title="Update Targets order" ><i class="material-icons">sync</i></a>
+                        </h4>
+                    </li>
+                    <li class="collection-item">
+                            <div>
+                                <a><strong>Sorting Targets dragging the element in to the right position</strong></a>
+                            </div>
+                        </li>
+                    <li class="collection-item">
+                        <div>
+                            <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                            <a>Name</a>
+                            <a class="secondary-content">Options</a>
+                            <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+                            <a class="secondary-content" style="margin-right:60px;">Type</a>
+                        </div>
+                    </li>
+                    <li class="collection-item targets">
+                        <ul class="sortable-targets">
+                                {{range $t := .Targets }} 
+                                {{if ne $t.Status.Name "inactive" }}
+                                <!--<li class="collection-item">-->
+                                <li class="collection-item avatar">
+                                    <div data-id="{{$t.ID.Hex}}"><i class="material-icons" style="float:left;margin-left:-90px;">unfold_more</i>
+                                        {{if eq $t.Status.Name "init" }}
+                                            <a href="#" class="active-target circle" data-id="{{$t.ID.Hex}}"><i class="material-icons">info</i></a>                            
+                                        {{end}} 
+                                        {{if eq $t.Status.Name "active" }}
+                                            <a href="#"><i class="material-icons circle">check</i></a> 
+                                        {{end}} 
+                                        {{if eq $t.Status.Name "complete"}}
+                                            <a href="#"><i class="material-icons circle">close</i></a> 
+                                        {{end}}
+                                    </div>
+                                    <p>
+                                        {{range $k, $v := $t.Name}}
+                                        <a href="../targets/{{$t.ID.Hex}}">{{$k}} - {{$v}}</a></br>
+                                        {{end}}
+                                    </p>
+                                        <a href="#" class="del-target secondary-content" data-id="{{$t.ID.Hex}}"><i class="material-icons">close</i></a>
+                                        <a href="#" class="edit-target secondary-content" data-id="{{$t.ID.Hex}}" style="margin-right:30px;"><i class="material-icons">edit</i></a>
+                                        <a class="secondary-content" style="margin-right:90px;">{{$t.Type}} &nbsp;&nbsp;&nbsp;</a>
+                                    
+                                    <!--</div>-->
+                                </li>
+                            {{end}} 
+                            {{end}}
+                        </ul>
+                    </li>
+                        
+                </ul>
+            </div>
+        </div>
+
+        <div class="row holder-map">
+            <div class="controls col s12 m12">
+                <h9 for="desription"><strong>Use Double click to create a Target</strong></h9>
+                <input id="pac-input" class="controls white" type="text" placeholder="Search" style="width:600px;">
+                <div id="map" style="width:100%;height:600px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row"></div>
+
+<!-- Modal Target Detail -->
+<div id="modal_target_detail" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <h4>Target</h4>
+            <form class="form-horizontal form--flex" role="form" method="POST" action="../targets/{{.Mission.ID.Hex}}" enctype="multipart/form-data">
+                <input type="hidden" class="" name="game_id" value="{{.Mission.ID.Hex}}" />
+                <input type="hidden" class="form_order" name="order" value="1" />
+                <input type="hidden" class="form_lat" name="lat" />
+                <input type="hidden" class="form_lng" name="long" />
+                <div class="row">
+                    <div class="input-field col s12 m12">
+                        <span for="">The name and description is updated according to the selected language. If its needed to overwrite just select the same Language</span>
+                    </div>
+                </div>
+                <!-- Language, Name and Description -->
+                <div class="row">
+                    <div class="input-field col s12 m4">
+                        <select class="form-resource target" name="language">
+                            <option value="" disabled selected>Select</option>
+                            {{range $m := .Languages}}
+                                <option value="{{$m.Code}}">{{$m.Code}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="input-field col s12 m8">
+                            <label for="web_url">Web URL</label>
+                            <input id="web_url" type="url" class="form-control" name="web_url" minlength="6">
+                        </div>
+                    <div class="input-field col s12 m12">
+                        <label for="name">Name</label>
+                        <input id="name" type="text" class="form-control" name="name">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 m12">
+                        <label for="description">Description</label>
+                        <input id="description" type="text" class="form-control" name="description" minlength="6">
+                    </div>
+                </div>
+                <!--DATETIME FIELDS-->
+                <div class="row pickers">
+                    <div class="controls col s6 m6">
+                        <label for="start_date">Start Date</label>
+                        <input id="start_date" type="text" class="datepicker from-now" name="start_date" minlength="6" required="false">
+                    </div>
+                    <div class="input-field col s12 m6">
+                        <input id="start_time" type="text" class="timepicker" name="start_time" intervals="5">
+                        <label for="start_time">Start Hour</label>
+                    </div>
+                </div>
+                <div class="row pickers">
+                    <div class="controls col s6 m6">
+                        <label for="end_date">End Date</label>
+                        <input id="end_date" type="text" class="datepicker from-now" name="end_date" minlength="6" required="false">
+                    </div>
+                    <div class="input-field col s12 m6">
+                        <input id="end_time" type="text" class="timepicker" name="end_time" intervals="5">
+                        <label for="end_time">End Hour</label>
+                    </div>
+                </div>
+                <!--SELECT FIELDS-->
+                <div class="row selects">
+                    <!--Target Types-->
+                    <div class="input-field col s6 m4">
+                        <select class="form_type" name="type">
+                            {{range $k, $v := .Types}}
+                                <option value="{{$k}}">{{$v}}</option>
+                            {{end}}
+                        </select>
+                        <label for="desription">Target Type</label>
+                    </div>
+                    <!--Web Game Types-->
+                    <div class="input-field col s6 m4 hide">
+                        <select class="form_webgame" name="webgame">
+                            {{range $m := .WebGames}}
+                                <option value="{{$m.NameURL}}">{{$m.Name}}</option>
+                            {{end}}
+                        </select>
+                        <label for="desription">Web Game</label>
+                    </div>
+                    <!--Select of Next Target-->
+                    <div class="input-field col s6 m4 hide">
+                    <!--
+                        <select class="form_next_step" name="next_step_id">
+                            {{range $m := .Targets}}
+                                <option value="{{$m.ID.Hex}}">{{$m.Order}} - {{$m.Name}}</option>
+                            {{end}}
+                        </select>
+                    -->
+                        <label for="desription">Next Target</label>
+                    </div>
+                    <!--Case Target Type TEXT/NIP-->
+                    <div class="input-field col s12 m4">
+                        <label for="form-score">Answer/Score</label>
+                        <input id="form-score" type="text" class="form-control" name="score">
+                    </div>
+                </div>
+                <!--IMAGE FIELD-->
+                <div class="row cover_pic">
+                    <div class="file-field input-field col s12 m12">
+                        <div class="btn">
+                            <span>File</span>
+                            <input id="target_image" name="target_image" type="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text" value="Chose a cover image">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Send
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div class="JS_main" style="display:none">
+    <script type="text/javascript" src="/public/js/jquery-ui-1.12.1.min.js"></script>
+    <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+</div>
+
+<script>
+    //(function($){
+    var markers = [],
+    validDates = false;
+    var 
+    _modal_detail_target = $("#modal_target_detail"),
+    _form_target = $("#modal_target_detail form"),
+    _row_start_time = $("#start_time"),
+    _row_end_time = $("#end_time");
+
+    $(document).ready(function () {
+        var map;
+
+        //if($(".collection-item.targets").length>0)
+            //$(".holder-map").remove()
+        
+        $( ".sortable-targets" ).sortable();
+        $( ".sortable-targets" ).disableSelection();
+
+    });
+
+    // Function to draw the google map
+    function myMap() {
+        var mapProp = {
+            center: new google.maps.LatLng(19.432608, -99.133209),
+            zoom: 13,
+        };
+        map = new google.maps.Map(document.getElementById("map"), mapProp);
+
+        google.maps.event.addListener(map, 'click', function (event) {
+            deleteMarkers();
+            placeMarker(event.latLng);
+        });
+
+        google.maps.event.addListener(map, 'dblclick', function (event) {
+            if (markers.length == 1) {
+
+                $(".form_lat").val(markers[0].position.lat())
+                $(".form_lng").val(markers[0].position.lng())
+
+                _form_target.prop("action","/spyc_admin/targets/{{.Mission.ID.Hex}}"),
+                _form_target.prop("method","post"),
+                _form_target.find("#target_image").addClass("required");
+                setFormFields("new");
+                _modal_detail_target.modal("open");
+            }
+            return false
+        });
+
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        // Listen for the event fired when the user selects a prediction and retrieve
+      // more details for that place.
+      searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+
+        // Clear out the old markers.
+        markers.forEach(function(marker) {
+          marker.setMap(null);
+        });
+        markers = [];
+
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+          if (!place.geometry) {
+            console.log("Returned place contains no geometry");
+            return;
+          }
+          var icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25)
+          };
+
+          // Create a marker for each place.
+          markers.push(new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: place.name,
+            position: place.geometry.location
+          }));
+
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+      });
+
+    }
+
+    // function to paint the marker on map
+    function placeMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+        markers.push(marker)
+    }
+
+    // Sets the map on all markers in the array.
+    function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+    start_date
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setMapOnAll(null);
+    }
+
+    // Deletes all markers in the array by removing references to them.
+    function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+    }
+
+    // Fixed dates and times
+    $(".datepicker.from-now").on("change",function(){
+
+        var myDate = toValidDate($(this).val())
+        var valid, now = new Date();
+
+        now.setHours(0), now.setMinutes(0), now.setSeconds(0),now.setMilliseconds(0); 
+
+        if (myDate < now){
+        $(this).addClass("invalid")
+        }else{
+        $(this).removeClass("invalid"), valid = true
+        }
+
+        if($("#start_date").val()!="" && $("#end_date").val()!=""){
+            myDate = new Date(toValidDate($("#start_date").val()))
+            now = new Date(toValidDate($("#end_date").val()))
+            if (myDate>now){
+            $("#start_date").addClass("invalid"),$("#end_date").addClass("invalid")
+            }else{
+            if(valid){
+                $("#start_date").removeClass("invalid"),$("#end_date").removeClass("invalid")
+                validDates = true
+            }
+            }
+        }
+    });
+
+     // Fix time picker to only half hour and o'clock time
+    $(".timepicker").on("change",function(){
+        var times = $(this).val().split(":");
+        if($(this).attr("intervals") != undefined){
+            var min = $(this).attr("intervals") * Math.round(times[1]/$(this).attr("intervals"));
+            $(this).val(times[0]+":"+ (min==60?"55":min<10?('00'+min).slice(-2):min));
+        }
+    });
+
+    // Handle click event on type select
+    $("select.form_type").on("change", function () {
+
+        if ($(this).val() == "webgame") {
+            if ($("select.form_webgame").parent().parent().hasClass("hide"))
+                $("select.form_webgame").parent().parent().removeClass("hide")
+        }
+        else {
+            $("select.form_webgame").parent().parent().addClass("hide")
+        }
+        if ($(this).val()=="text" || $(this).val()=="nip"){
+            if ($("form-score").parent().hasClass("hide"))
+                $("form-score").parent().removeClass("hide")
+                else 
+                $("form-score").parent().addClass("hide")
+        }
+        
+    });
+
+    // Edit Target click
+    $(".edit-target").on("click", function () {
+
+        var 
+        id = $(this).attr("data-id"),
+        param = {"format":"json"};
+
+        _form_target.prop("action","/spyc_admin/targets/update/"+id),
+        _form_target.find("#target_image").removeClass("required");
+        setFormFields("edit");
+        
+        // Get Target Detail
+        $.ajax({
+            url: "../targets/" + id,
+            method: "get",
+            data: param,
+            beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+            success: function (resp) {
+
+                if (resp.success)
+                fillFormDetail(resp.data),
+                _modal_detail_target.modal("open");
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+     // Save form 
+    _form_target.on("submit", function () {
+
+        var split = new Date().toString().split(" ");
+        var timeZoneFormatted = split[split.length - 2].substring(3);
+
+        var hasFiles = true
+        $('input[type=file]').each(function(){
+            if (typeof this.files[0] !== "object" && $(this).hasClass("required") ){
+                hasFiles=false;
+                $(this).parent().siblings(".file-path-wrapper").find("input").addClass("invalid");
+            }else{
+                $(this).parent().siblings(".file-path-wrapper").find("input").removeClass("invalid");
+            }
+        })
+
+        if(!hasFiles || !validDates){  return false; }
+
+        _row_start_time.val(_row_start_time.val() + " "+ timeZoneFormatted);
+        _row_end_time.val(_row_end_time.val() + " "+ timeZoneFormatted);
+
+        // Validate wheter is create or not
+        if (_form_mission.attr("action").split("/").length <=4) {
+        }
+        return;
+    });
+
+    //Handle delete function
+    $(".del-target").on("click", function () {
+        var id = $(this).attr("data-id");
+
+        // Send object to endpoint
+        $.ajax({
+            url: "../targets/" + id,
+            method: "delete",
+            success: function (result) {
+                alert(result.success);
+                //$("#modal_question_detail").modal("close");
+                location.reload();
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Get Trgets by MissionID
+    $("#form_r_mission").on("change",function(){
+        var id = $(this).val();
+        $.ajax({
+            url: "targets/game/" + id,
+            method: "get",
+            success: function (result) {
+                if (result.data.length>0){
+                    select_targets.empty().append(fillViews(views.option, result.data)).material_select("update");
+                    select_targets.trigger("change",id)
+                }
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Update targets order
+    $(".update-order").on("click",function(){
+        var req = new Object();
+        $(".sortable-targets div").each(function(i,v){
+            req[i+1] = $(v).attr("data-id");
+        })
+        $.ajax({
+            url: "../targets/order/" + "{{.Mission.ID.Hex}}",
+            method: "post",
+            contentType: "application/json",
+            data: JSON.stringify(req),
+            success: function (result) {
+                if (result.success){
+                    alert(result.message);
+                    location.reload();
+                }
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    }) // end function
+
+    function setFormFields(type){
+        _form_target.find(".pickers").css({display:type=="new"?"block":"none"}),
+        _form_target.find(".selects").css({display:type=="new"?"block":"none"});
+    }
+
+    function fillFormDetail(target){
+        //_form_target.find("#name").val(target!=""?target.name:""),
+        _form_target.find("#name").val("")
+        _form_target.find("#web_url").val(target!=""?target.web_url:""),
+        //_form_target.find("#description").val(target!=""?target.description:"");
+        _form_target.find("#description").val("");
+    };
+
+</script>
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?libraries=places&sensor=false&key={{.JSapikey}}&callback=myMap"></script>
+
+{{template "dfooter.html" .}}

@@ -1,0 +1,35 @@
+
+###...SMS...###
+###.........###
+# Verification code
+# Example: SpyChatter account verification code:<code>
+sms.verification=SpyChatter account verification code. spycode:%s
+
+# Invite SMS
+# Example: Your friend <email> invited you to use SpyCatter download on <link>
+sms.invite=Your friend %s invited you to use SpyChatter, download on: %s
+
+# Email text
+email.reset_password=<h1>Hi %s!!</h1></br></br><div>For reset your password visit next <a href="%s">link</a>
+email.reset_password_sms=Hi %s!! For reset your password visit next link: %s 
+
+# Notification
+notification.new_message_from_title=New message from %s
+notification.new_friend_request_title=New friend request
+notification.new_friend_request=%s sent a friend request
+notification.friend_request_confirmed_title=New friend
+notification.friend_request_confirmed=%s and you are friends now
+# Chat Messages types
+notification.image_message=Send you an image
+notification.document_message=Send you a document
+notification.location_message=Send you a location
+notification.challenge_message=Send you a challenge
+notification.git_message=Send you a GIF
+notification.animation_message=Send you an animation
+notification.sticker_message=Send you a sticker
+notification.audio_message=Send you an audio
+notification.video_message=Send you a video
+notification.link_message=Send you a link
+notification.contact_message=Send you a contact
+notification.status_challenge_message=Completed a challenge
+notification.screenshot_message=Take a screenshot

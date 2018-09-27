@@ -1,0 +1,283 @@
+{{set . "title" "Games"}}
+{{template "dheader.html" .}}
+
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Games</a></li>
+      <li class="tab col s3"><a id="t2" href="#tab2">New Game</a></li>
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+  <!-- Target list -->
+  <div id="tab1" class="col s12">
+
+    <!-- Table -->
+    <div class="row">
+      <div class="col s12 m8 offset-m2">
+        <ul class="collection with-header">
+          <li class="collection-item header">
+            <div>
+                <a class="medium-tab" style="padding-left:100px;">Name</a>
+                <a class="small-tab" style="padding-left:50px;"></a>
+                <a class="target-response">URL name</a>
+                <a class="secondary-content">Actions</a>
+                <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+            </div>
+          </li>
+        <!--Select of games-->
+          {{range $m := .Games }}
+
+            <li class="collection-item">
+                
+                <!--<img src="http://allswalls.com/images/ariel-rebel-adult-model-women-females-girls-sexy-babes-d-wallpaper-1.jpg" alt="" class="circle">-->
+                {{if eq $m.Status.Name "init" }}
+                  <a href="#" class="active-target" data-id="{{$m.ID.Hex}}"><i class="material-icons">info</i></a>
+                {{end}}
+                {{if eq $m.Status.Name "active" }}
+                  <a href="#"><i class="material-icons small-tab" style="padding-left:50px;">check</i></a>
+                {{end}}
+                {{if eq $m.Status.Name "inactive"}}
+                  <a href="#"><i class="material-icons">close</i></a>
+                {{end}}
+                <a>{{$m.Name}}</a>
+                <a class="small-tab" style="padding-left:50px;"></a>
+                <a class="target-response">{{$m.NameURL}}</a>
+                <a class="del-target secondary-content" data-id="{{$m.ID.Hex}}" href="#"><i class="material-icons">close</i></a>
+                <a class="edit-target secondary-content" data-id="{{$m.ID.Hex}}" href="#"><i class="material-icons">edit</i></a>
+                <a class="secondary-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <!--<a href="webgames/{{$m.ID.Hex}}" class="secondary-content"><i class="material-icons">send</i></a>-->
+                <div>
+                </div>
+            </li>
+
+          {{end}}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Game form -->
+    <div id="tab2" class="col s12">
+        <div class="row">
+            <div class="controls col s12 m8 push-m2">
+                <form id="sponsor_form" class="col s12 m12" action="webgames" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="row">
+                            <div class="input-field col s12 m4">
+                                <input id="title" type="text" class="validate" name="name" required>
+                                <label for="title">Name</label>
+                            </div>
+                            <div class="input-field col s12 m4">
+                                <input id="title" type="text" class="validate" name="name_url" required>
+                                <label for="title">Name URL</label>
+                            </div>
+                            <div class="input-field col s12 m4">
+                                <select class="form-resource target" name="language">
+                                    <option value="" disabled selected>Select</option>
+                                    {{range $m := .Languages}}
+                                        <option value="{{$m.Code}}">{{$m.Code}}</option>
+                                    {{end}}
+                                </select>
+                                <label for="title">Language</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 m12">
+                                <input id="title" type="text" class="validate" name="description" required>
+                                <label for="title">Description</label>
+                            </div>
+                        </div>
+                        <div class="row cover_pic">
+                                <div class="input-field col s6 m6">
+                                    <div class="file-field input-field">
+                                        <div class="btn">
+                                            <span>Game Picture</span>
+                                            <input type="file" name="webgame_picture">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="row">
+                        <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Send
+                            <i class="material-icons right">send</i>
+                            </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal modal-fixed-footer">
+        <form id="mission" class="col s12" action="/spyc_admin/webgames/update" method="post" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="row">
+                    <div class="row">
+                        <div class="input-field col s12 m4">
+                            <input id="title" type="text" class="update-val validate" name="name" required>
+                            <label for="title">Name</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <input id="web_url" type="text" class="update-val validate" name="name_url" required>
+                            <label for="web_url">Name URL</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <select class="form-resource target" name="language">
+                                <option value="" disabled selected>Select</option>
+                                {{range $m := .Languages}}
+                                    <option value="{{$m.Code}}">{{$m.Code}}</option>
+                                {{end}}
+                            </select>
+                            <label for="title">Language</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m12">
+                            <span for="">The description is updated according to the language selected. If its needed to overwrite just select the same Language</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m12">
+                            <input id="description" type="text" class="update-val validate" name="description">
+                            <label for="title">Description</label>
+                        </div>
+                    </div>
+                    <div class="row cover_pic">
+                            <div class="input-field col s12 m12">
+                                <div class="file-field input-field">
+                                    <div class="btn">
+                                        <span>Game Picture</span>
+                                        <input class="cover_picture" type="file" name="webgame_picture">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+                <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Enviar
+                <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+</div>
+
+<div class="JS_main" style="display:none">
+        <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+      </div>
+<script>
+
+    var views = {
+      option: "<option value='$.value' d-type='$.type' >$.name</option>",
+
+      row_target :  '<li class="collection-item row-subs"><div><a href="#">$.email</a>'+
+                    '<a href="#" class="del-target secondary-content create-winner" data-gid="$.gID" data-sid="$.subID"><i class="material-icons">check</i></a>'+
+                    '<a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>'+
+                    '<a href="#" class="secondary-content">$.score</a>'+
+                    '</div></li>'
+  };
+
+  var 
+  table_body = $(".collection-item.no-info").css({"display":"none"}),
+  _filter_mission = $("#form_r_mission"),
+  _form_game = $("#modal1 form"),
+  _modal_detail_game = $("#modal1");
+
+  $(document).ready(function(){
+
+        function fillFormDetail(game){
+            _form_game.find("#title").val(game!=""?game.name:""),
+            _form_game.find("#web_url").val(game!=""?game.url_name:"");
+            //_form_game.find("#description").val(game!=""?game.description:"")
+        };
+
+        // Active Sponsor request
+        $(".active-target").on("click", function () {
+
+            var id = $(this).attr("data-id");
+
+            // Send object to endpoint
+            $.ajax({
+                url: "webgames/activate/" + id,
+                method: "post",
+                success: function (result) {
+                    alert(result.success);
+                    location.reload();
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+    
+        // Edit Reward click
+        $(".edit-target").on("click", function () {
+
+            var 
+            id = $(this).attr("data-id"),
+            param = {"format":"json"};
+
+            _form_game.prop("action","/spyc_admin/webgames/update/"+id);
+            
+            // Send object to endpoint
+            $.ajax({
+                url: "webgames/" + id,
+                method: "get",
+                data: param,
+                beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+                success: function (resp) {
+                    if (resp.success)
+                    fillFormDetail(resp.data),
+                    _modal_detail_game.modal("open");
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+        //Handle delete function
+        $(".del-target").on("click", function () {
+            var id = $(this).attr("data-id");
+
+            $.ajax({
+                url: "webgames/" + id,
+                method: "delete",
+                success: function (result) {
+                    alert(result.message);
+                    //$("#modal_question_detail").modal("close");
+                    location.reload();
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+        // Handle update
+        _form_game.on("submit", function () {
+            return true;
+        });
+
+  });
+
+
+</script>
+
+{{template "dfooter.html" .}}

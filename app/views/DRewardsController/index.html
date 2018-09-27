@@ -1,0 +1,450 @@
+{{set . "title" "Rewards"}}
+{{template "dheader.html" .}}
+
+<style>
+    span.row-subtitle{
+        color: black;
+    }
+</style>
+
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Rewards List</a></li>
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+    <!-- Mission list -->
+    <div id="tab1" class="col s12">
+
+        <!-- Filter -->
+    <div class="row col s12 m10 offset-m1">
+            <!--Select of Countries-->
+              <div class="input-field col s6 m3">
+                  <select id="form_r_country" class="form-resource target" name="country">
+                      {{range $m := .Countries}}
+                          <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                      {{end}}
+                  </select>
+                  <label for="desription">Country</label>
+              </div>
+              <!-- Select of Campaigns -->
+            <div class="input-field col s6 m3">
+                    <select id="filter_campaign" class="form-resource target" name="campaign">
+                        {{range $m := .Campaigns}}
+                            <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                        {{end}}
+                    </select>
+                    <label for="campaign">Campaign</label>
+                </div>
+              <!--Select of Missions-
+              <div class="input-field col s6 m3">
+                  <select id="" class="form-resource form_r_mission" name="country">
+                        <option value="" disabled>Select</option>
+                  </select>
+                  <label for="desription">Mission</label>
+              </div>
+                -->
+              <!--Select of Target Types-->
+            <div class="input-field col s6 m2">
+                <select class="form_type" name="type">
+                        <option value="" disabled>Select</option>
+                </select>
+                <label for="desription">Type</label>
+            </div>
+            <div class="col s6 m2">
+                <button id="filter_submit" class="btn waves-effect waves-light" type="" name="submit">Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="row">
+        <div class="col s12 m8 offset-m2">
+            <ul class="collection with-header">
+                <li class="collection-header"><h4>Rewards
+                    <a id="show_modal" href="#" class="secondary-content" title="New Reward">
+                            <i class="material-icons">add_circle_outline</i></a></h4>
+                </li>
+                <li class="collection-item">
+                    <div>
+                        <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                        <a>Name</a>
+                        <a class="secondary-content">Options</a>
+                        <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+                    </div>
+                </li>
+                <li class="collection-item avatar row-subs">
+                    <p>
+                        <a href="#">There is no information to display</a></br>
+                    </p>
+                </li>
+            </ul>
+        </div>
+        </div>
+    </div>
+    
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal modal-fixed-footer">
+    <form id="mission" class="col s12" action="/spyc_admin/rewards" method="post" enctype="multipart/form-data">
+    <input type="hidden" class="form_lat" name="lat" />
+        <input type="hidden" class="form_lng" name="lng" />
+        <input type="hidden" class="form_r_type" name="resource_type" value="" />
+        <input type="hidden" class="form_campaign" name="campaign" />
+        <div class="modal-content">
+            <div class="row">
+                <div class="row">
+                    <div class="input-field col s12 m12">
+                        <span for="">The description and title is updated according to the selected language. If its needed to overwrite just select the same Language</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 m6">
+                        <select class="form-resource target" name="language">
+                            <option value="" disabled selected>Select</option>
+                            {{range $m := .Languages}}
+                                <option value="{{$m.Code}}">{{$m.Code}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="input-field col s12 m12">
+                        <input id="title" type="text" class="validate" name="name">
+                        <label for="title">Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="description" class="materialize-textarea" name="description" data-length="120"></textarea>
+                        <label for="description">Descripcion</label>
+                    </div>
+                </div>
+                <div class="row selects">
+                <!--Select of Resources for reward-->
+                    <div class="input-field col s6 m6">
+                        <select id="" class="form-resource form_r_mission" name="">
+                                <option value="" disabled>Select</option>
+                        </select>
+                        <label for="desription">Mission</label>
+                    </div>
+
+                    <div class="input-field col s6 m6">
+                        <select id="" class="form-resource form_r_target" name="resource_id">
+                            <option value="" disabled>Select</option>
+                        </select>
+                        <label for="desription">Target</label>
+                    </div>
+                </div> 
+                <div class="row">
+                    <div class="input-field col s6 m4">
+                      <select id="reward-multiple" class="" name="multiple">
+                              <option value="false">False</option>
+                              <option value="true">True</option>
+                      </select>
+                      <label for="desription">Multiple</label>
+                    </div>
+                    <div class="input-field col s6 m4 hide">
+                      <label for="max_winners">Max Winners</label>
+                      <input id="max_winners" type="number" class="form-control" name="max_winners" min="0" max="999">
+                    </div>
+                  </div>
+                <div class="row cover_pic">
+                    <div class="input-field col s6 m12">
+                        <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Image</span>
+                            <input type="file" name="reward_picture" accept="image/*">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+        <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Send
+        <i class="material-icons right">send</i>
+        </button>
+    </div>
+    </form>
+    </div>
+
+    <div class="JS_main" style="display:none">
+    <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+    </div>
+
+<script>
+  var markers = [],
+  _select_targets = $("select.form_r_target"),
+  _form_reward = $("#modal1 form"),
+  _modal_detail_reward = $("#modal1"),
+  _row_reward_multiple = $("#reward-multiple"),
+  _row_max_winners = $("#max_winners"),
+  _select_missions = $("select.form_r_mission"),
+  _filter_submit = $("#filter_submit"),
+  _filter_campaign = $("select#filter_campaign"),
+  views = {
+        row_reward: '<li class="collection-item avatar row-subs">'+
+                        '<a href="#" class="$.activation" data-id="$.id"><i class="material-icons circle">$.status</i></a>'+
+                        '<p>'+
+                            '<a href="rewards/$.id"><span class="row-subtitle">Reward: &nbsp;</span>$.name</a></br>'+
+                            '<a href="rewards/$.id"><span class="row-subtitle">Mission:</span>$.mission</a></br>'+
+                            '<a href="rewards/$.id"><span class="row-subtitle">Target: &nbsp;</span>$.target</a>'+
+                        '</p>'+
+                        '<div>'+
+                            '<a class="del-target secondary-content" data-id="$.id" href="#"><i class="material-icons">close</i></a>'+
+                            '<a class="edit-target secondary-content" data-id="$.id" href="#" style="margin-right:30px;"><i class="material-icons">edit</i></a>'+
+                        '</div>'+
+                    '</li>',
+    };
+
+  (function(){
+
+    $(".form_type").parent().remove();
+    $("#form_r_country").parent().parent().remove();
+
+    function filterDataFilters(data,type){
+        var resArr = [];
+        if (data.length){
+            switch(type){
+                case "mission":
+                    for(var i =0; i<data.length; i++){
+                        resArr[i] = {"id":data[i].id, "selected": false, "value": data[i].title}
+                    }
+                    break;
+                case "target":
+                    for (var i=0;i< data.length; i++){
+                        resArr.push({
+                            "id":data[i].id,
+                            "value": data[i].name,
+                            "selected": false,
+                        })
+                    }
+                    break;
+                case "table":
+                    for (var i=0;i< data.length; i++){
+                        resArr.push({  "id":data[i].id,  "value": data[i].name,  "selected": false,
+                        })
+                    }
+                    break;
+            }
+        }
+        return resArr;
+    }
+
+    // Handle campaign select
+    _filter_campaign.on("change",function(){
+        var 
+        id = $(this).val();
+        $(".form_campaign").val($(this).val());
+        $.ajax({
+            url: "missions/campaign/" + id,
+            method: "get",
+            beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+                },
+            success: function (result) {
+                if (result.data.length>0){
+                    _select_missions.each(function(){
+                        $(this).fillValues({datas:filterDataFilters(result.data,"mission")}),
+                        $(this).material_select("update");
+                    }),_select_missions.first().trigger("change",id);
+                }
+            },
+            error: function (err) {
+                alert(err.responseText)
+            },
+        }); // end ajax
+    });
+
+    // Get Trgets by MissionID
+    _select_missions.on("change",function(){
+        var id = $(this).val();
+        $.ajax({
+            url: "targets/game/" + id,
+            method: "get",
+            success: function (result) {
+                if (result.data.length>0){
+                    _select_targets.each(function(){
+                        $(this).fillValues({datas:filterDataFilters(result.data,"target")}),
+                        $(this).material_select("update");
+                    });
+                }else{
+                    _select_targets.each(function(){
+                        $(this).empty(), $(this).material_select("update");
+                    });
+                }
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Change resource type
+    $("#form_r_target").on("change",function(id){
+        var tType = $("#form_r_target").find("option:selected").attr("d-type")
+        $(".form_r_type").val(tType)
+    });
+
+    // Get Subscriptions by target
+    _filter_submit.on("click",function(){
+        var 
+        id =_select_targets.val(),
+        param = {"format":"json", "idCampaign": _filter_campaign.val()};
+        $.ajax({
+            url: "rewards",
+            method: "get",
+            data: param,
+            beforeSend: function(request) {
+                request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+            },
+            success: function (result) {
+                if (result.data.length>0){
+                    $(".row-subs").remove();                    
+                    $(".collection-item").parent().append(fillViews(views.row_reward, result.data));
+                    tableListener();
+                }else{
+                    $(".row-subs").remove()
+                }
+            },
+            error: function (err) {
+                alert(err.responseText)
+            },
+        }); // end ajax
+    });
+
+    // Handle select for multiple value
+    _row_reward_multiple.on("change", function(){
+        if (_row_reward_multiple.val() == "true"){
+        _row_max_winners.parent().removeClass("hide");
+        }else{
+        _row_max_winners.parent().addClass("hide");
+        }
+    });
+
+    function fillViews(view, arr){
+        var result="", status ="", activate = "", lang = "{{.user.Device.Language}}";
+        for(var i=0;i<arr.length;i++){
+
+            switch(arr[i]["status"]){
+                case "init": status = "info", activate = "active-target"; break;
+                case "active": status = "check"; break;
+                case "completed": status = "done_all"; break;
+                default: status = "block"; break;
+            }
+            
+            result += view.replace( new RegExp("\\$.id", 'g'), arr[i]["id"])
+                            .replace(new RegExp("\\$.name", 'g'), arr[i]["name"][arr[i]["langs"][0]])
+                            .replace(new RegExp("\\$.mission", 'g'), arr[i]["mission"][arr[i]["langs"][0]])
+                            .replace(new RegExp("\\$.target", 'g'), arr[i]["target"][arr[i]["langs"][0]])
+                            .replace(new RegExp("\\$.activation", 'g'),  activate)
+                            .replace(new RegExp("\\$.status", 'g'), status);
+        }
+        return result;
+    }
+
+    function setFormFields(type){
+        _form_reward.find(".selects").css({display:type=="new"?"block":"none"});
+    }
+
+    function fillFormDetail(reward){
+        _form_reward.find("#title").val(""),
+        _form_reward.find("#description").val("");
+    };
+
+    // Handles the table events
+    var tableListener = function(){
+
+        // Active Reward request
+        $(".active-target").on("click", function(){
+            var id = $(this).attr("data-id");
+            // Send object to endpoint
+            $.ajax({
+                url: "rewards/active/" + id,
+                method: "post",
+                success: function (result) {
+                    alert(result.success);
+                    location.reload();
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+        // Handle validate click
+        $(".edit-target").on("click",function(){
+            var 
+            id = $(this).attr("data-id"),
+            param = {"format":"json"};
+    
+            _form_reward.prop("action","/spyc_admin/rewards/update/"+id);
+            setFormFields("edit");
+            
+            // Send object to endpoint
+            $.ajax({
+                url: "rewards/" + id,
+                method: "get",
+                data: param,
+                beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+                success: function (resp) {
+                    if (resp.success)
+                    fillFormDetail(resp.data),
+                    _modal_detail_reward.modal("open");
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        }); // end function
+
+        //Handle delete function
+        $(".del-target").on("click", function () {
+            var id = $(this).attr("data-id");
+
+            $.ajax({
+                url: "rewards/" + id,
+                method: "delete",
+                success: function (result) {
+                    alert(result.message);
+                    //$("#modal_question_detail").modal("close");
+                    location.reload();
+                },
+                error: function (err) {
+                    alert(err)
+                },
+            }); // end ajax
+        });
+
+    };
+
+    // Hadle show Question modal
+    $("#show_modal").on("click",function(){
+        fillFormDetail("");
+        setFormFields("new");
+        _form_reward.prop("action","/spyc_admin/rewards")
+        $("#modal1").modal("open");
+    });
+
+    // Save form 
+    _form_reward.on("submit", function () {
+    });
+    _filter_campaign.trigger("change"),_filter_submit.trigger("click");
+  })();
+
+    
+
+</script>
+
+{{template "dfooter.html" .}}

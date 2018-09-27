@@ -1,0 +1,697 @@
+{{set . "title" "Missions"}}
+{{template "dheader.html" .}}
+
+<style>
+  span.row-subtitle{
+      color: black;
+  }
+</style>
+
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Misisons List</a></li>
+      <li class="tab col s3"><a id="t2" href="#tab2">New Mission</a></li>
+      <li class="tab col s3"><a id="t3" href="#tab3">Search</a></li>
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+  <!-- Filter -->
+  <div class="row col s12 m10 offset-m1">
+    <!--Select of Countries-->
+      <div class="input-field col s6 m3 hide">
+          <select id="form_r_country" class="form-resource target" name="country">
+              {{range $m := .Countries}}
+                  <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+              {{end}}
+          </select>
+          <label for="desription">Country</label>
+      </div>
+      <!-- Select of Campaigns -->
+    <div class="input-field col s6 m3">
+            <select id="filter_campaign" class="form-resource target" name="campaign">
+                {{range $m := .Campaigns}}
+                    <option value="{{$m.ID.Hex}}" data-sponsor="{{$m.Sponsor.Hex}}">{{$m.Name}}</option>
+                {{end}}
+            </select>
+            <label for="campaign">Campaign</label>
+        </div>
+    <div class="col s6 m2">
+        <button id="filter_submit" class="btn waves-effect waves-light" type="" name="submit">Search
+        </button>
+    </div>
+</div>
+
+  <!-- Mission list local_atm-->
+  <div id="tab1" class="col s12">
+    <div class="row">
+      <div class="col s12 m6 offset-m3">
+        <ul class="collection with-header">
+          <li class="collection-header"><h4>Missions</h4></li>
+          <li class="collection-item">
+              <div>
+                  <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                  <a>Name</a>
+                  <a class="secondary-content">Options</a>
+                  <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+              </div>
+          </li>
+          <li class="collection-item avatar row-subs">
+            <p><a href="#">There is no information to display</a></br></p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!--
+    {{if not (eq 0 $.Pages)}}
+      <div class="row">
+        <div class="col s12 m6 offset-m3">
+          <ul class="pagination" style="text-align: center;">
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+            {{range $k, $_ := N .Pages }}
+              <li class="{{if eq $k $.CurrentPage}}active{{end}}"><a href="missions?page={{add $k 1}}&quantity=10">{{add $k 1}}</a></li>
+            {{end}}
+            <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+          </ul>
+        </div>
+      </div>
+    {{end}}
+    -->
+  </div>
+
+  <!-- New mission form -->
+  <div id="tab2" class="col s12">
+    <div class="row">
+        <div class="controls col s12 m8 push-m2">
+            <h9 for="desription"><strong>Use Double click to create a Mission</strong></h9>
+            <input id="pac-input" class="controls white" type="text" placeholder="Search" style="width:600px;">
+            <div id="map" style="width:800px;height:500px;"></div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Fidn missions by title -->
+  <div id="tab3" class="col s12">
+    <div class="row">
+      <div class="col s12 m6 offset-m3">
+        <div class="search-wrapper card">
+            <div class="row">
+              <div class="input-field col s12 m12">
+                <i class="material-icons prefix">search</i>
+                <input id="icon_prefix" type="text" class="validate" name="search">
+                <label for="icon_prefix">Search</label>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Structure -->
+ <div id="modal1" class="modal modal-fixed-footer" style="width:66%">
+   <form id="mission" class="col s12" action="" method="post" enctype="multipart/form-data">
+   <div class="modal-content">
+     <div class="row">
+       <!-- Campaigns and priority rows -->
+        <div class="row">
+            <div class="input-field col s12 m3">
+                <select id="form_r_campaign" class="form-resource target" name="campaign">
+                    {{range $m := .Campaigns}}
+                        <option value="{{$m.ID.Hex}}" data-sponsor="{{$m.Sponsor.Hex}}" >{{$m.Name}}</option>
+                    {{end}}
+                </select>
+                <label for="desription">Campaign</label>
+            </div>
+          <div class="input-field col s12 m3">
+              <select id="form_r_priority" class="form-resource target" name="priority">
+                  {{range $k, $v := .Priority}}
+                      <option value="{{$k}}">{{$v}}</option>
+                  {{end}}
+              </select>
+              <label for="desription">Priority</label>
+          </div>
+          <!--Select of Countries for Campaign-->
+          <div class="input-field col s12 m6">
+            <input type="hidden" class="countries" name="countries" />
+              <select id="form_r_country" class="form-resource target" name="country" multiple="multiple">
+                  {{range $m := .Countries}}
+                      <option value="{{$m.PrefISO}}">{{$m.Name}}</option>
+                  {{end}}
+              </select>
+              <label for="desription">Country</label>
+          </div>
+        </div>
+        <!-- Frequency and Mission Types rows -->
+        <div class="row">
+          <div class="input-field col s12 m4">
+              <select id="form_r_frequency" class="form-resource target" name="frequency">
+                  {{range $k, $v := .Frequency}}
+                      <option value="{{$k}}">{{$v}}</option>
+                  {{end}}
+              </select>
+              <label for="desription">Frequency</label>
+          </div>
+          <div class="input-field col s12 m4">
+              <select id="form_r_type" class="form-resource target" name="type">
+                  {{range $k, $v := .MissionTypes}}
+                      <option value="{{$k}}">{{$v}}</option>
+                  {{end}}
+              </select>
+              <label for="desription">Mission Type</label>
+          </div>
+        </div>
+        <!-- Start Pickers rows -->
+        <div class="row pickers">
+          <div class="input-field col s12 m6">
+            <input id="start_date" type="text" class="datepicker from-now" name="start_date" >
+            <label for="start_date">Dia de inicio</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="start_time" type="text" class="timepicker" name="start_time" intervals="5">
+            <label for="start_time">Hora de inicio</label>
+          </div>
+        </div>
+        <!-- End Pickers rows -->
+        <div class="row pickers">
+          <div class="input-field col s12 m6">
+            <input id="end_date" type="text" class="datepicker from-now" name="end_date">
+            <label for="end_date">Dia de finalizacion</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="end_time" type="text" class="timepicker" name="end_time" intervals="5">
+            <label for="end_time">Hora de finalizacion</label>
+          </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12 m12">
+                <span for="">The description and title is updated according to the selected language. If its needed to overwrite just select the same Language</span>
+            </div>
+        </div>
+        <!-- Language, title and description rows -->
+        <div class="row">
+            <div class="input-field col s12 m6">
+              <select class="form-resource target" name="language">
+                  <option value="" disabled selected>Select</option>
+                  {{range $m := .Languages}}
+                    <option value="{{$m.Code}}">{{$m.Code}}</option>
+                  {{end}}
+              </select>
+            </div>
+            <div class="input-field col s12 m12">
+              <input id="title" type="text" class="validate" name="title">
+              <label for="title">Title</label>
+            </div>
+          <div class="input-field col s12">
+            <textarea id="description" class="materialize-textarea" data-length="512" name="description"></textarea>
+            <label for="description">Descripcion</label>
+          </div>
+        </div>
+        <!-- Hidden Coordinates rows -->
+        <div class="row coords hide">
+          <div class="input-field col s6 m6">
+            <input id="lat" class="validate" name="lat" required readonly></input>
+            <label for="lat"></label>
+          </div>
+          <div class="input-field col s6 m6">
+            <input id="lng" class="validate" name="lng" required readonly></input>
+            <label for="lng"></label>
+          </div>
+        </div>
+        <!-- Mission cover picture rows -->
+        <div class="row cover_pic">
+          <div class="input-field col s12">
+            <div class="file-field input-field">
+              <div class="btn">
+                <span>Cover Picture</span>
+                <input id="cover_picture" type="file" name="cover_picture" accept="image/*">
+              </div>
+              <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+              <span>Advertisement</span>
+            </div>
+        </div>
+        <!-- Advertisement switch rows -->
+        <div class="row">
+              <div class="switch">
+                <label>Off<input type="checkbox"><span class="lever"></span>On</label>
+              </div>
+              <!--Advertisement Select ad -->
+              <div class="form_r_ads input-field col s12 m12" style="display:none">
+                  <select id="form_r_ads" class="form-resource target" name="advertisement">
+                          <option value="">No results</option>
+                  </select>
+              </div>
+        </div>
+    </div>
+   </div>
+   <div class="modal-footer">
+     <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+     <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Send
+       <i class="material-icons right">send</i>
+     </button>
+   </div>
+   </form>
+ </div>
+
+ <div class="JS_main" style="display:none">
+  <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+</div>
+
+<script>
+  var markers = [],
+  validDates=false, isNew = true;
+  var 
+  _form_mission = $("#modal1 form"),
+  _modal_detail_mission = $("#modal1"),
+  _row_video_ad = _form_mission.find(".row_ad"),
+  _select_ads = $("#form_r_ads"),
+  _row_start_time = $("#start_time"),
+  _filter_campaign = $("select#filter_campaign"),
+  _filter_submit = $("#filter_submit"),
+  _row_end_time = $("#end_time");
+
+  var views = {
+    _row_mission: '<li class="collection-item avatar row-subs">'+
+                    '<a href="#" class="$.activation" data-id="$.id"><i class="material-icons circle">$.status</i></a>'+
+                    '<p>'+
+                        '<a href="rewards/$.id"><span class="row-subtitle">Title: &nbsp;</span>$.name</a></br>'+
+                        '<a href="rewards/$.id"><span class="row-subtitle">Mission:</span>$.description</a></br>'+
+                    '</p>'+
+                    '<div>'+
+                        '<a class="del-target secondary-content" data-id="$.id" href="#"><i class="material-icons">close</i></a>'+
+                        '<a class="edit-target secondary-content" data-id="$.id" href="#" style="margin-right:30px;"><i class="material-icons">edit</i></a>'+
+                    '</div>'+
+                '</li>',
+  }
+
+  $(document).ready(function(){
+    var map;
+  });
+
+  function myMap() {
+    
+      var mapProp = {
+          center: new google.maps.LatLng(19.432608, -99.133209),
+          zoom: 13,
+      };
+
+      map = new google.maps.Map(document.getElementById("map"), mapProp);
+      google.maps.event.trigger(map, 'resize');
+
+      google.maps.event.addListener(map, 'click', function (event) {
+          deleteMarkers();
+          placeMarker(event.latLng);
+      });
+
+      google.maps.event.addListener(map, 'dblclick', function (event) {
+          if (markers.length == 1) {
+              $("#lat").val(markers[0].position.lat());
+              $("#lng").val(markers[0].position.lng());
+
+              _form_mission.prop("action","/spyc_admin/missions"),
+              _form_mission.prop("method","post");
+              fillFormDetail(""),
+              setFormFields("new");
+              _modal_detail_mission.modal("open");
+          }
+          return false
+      });
+
+      // Create the search box and link it to the UI element.
+      var input = document.getElementById('pac-input');
+      var searchBox = new google.maps.places.SearchBox(input);
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+      // Bias the SearchBox results towards current map's viewport.
+      map.addListener('bounds_changed', function() {
+        searchBox.setBounds(map.getBounds());
+      });
+
+      // Listen for the event fired when the user selects a prediction and retrieve
+      // more details for that place.
+      searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+          return;
+        }
+
+        // Clear out the old markers.
+        markers.forEach(function(marker) {
+          marker.setMap(null);
+        });
+        markers = [];
+
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+          if (!place.geometry) {
+            console.log("Returned place contains no geometry");
+            return;
+          }
+          var icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25)
+          };
+
+          // Create a marker for each place.
+          markers.push(new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: place.name,
+            position: place.geometry.location
+          }));
+
+          if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+          } else {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        map.fitBounds(bounds);
+      });
+
+  }
+
+  function placeMarker(location) {
+      var marker = new google.maps.Marker({
+          position: location,
+          map: map
+      });
+      markers.push(marker)
+  }
+
+  // Sets the map on all markers in the array.
+  function setMapOnAll(map) {
+      for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+      }
+  }
+
+  // Removes the markers from the map, but keeps them in the array.
+  function clearMarkers() {
+      setMapOnAll(null);
+  }
+
+  // Deletes all markers in the array by removing references to them.
+  function deleteMarkers() {
+      clearMarkers();
+      markers = [];
+  }
+
+  function filterDataFilters(data,type){
+      var resArr = [];
+      if (data.length){
+          switch(type){
+              case "ad":
+                for(var i=0;i<data.length;i++){
+                    resArr.push({"id": data[i].id, "value":data[i].name, "selected": false})
+                }
+                break;
+          }
+      }
+      return resArr;
+  }
+
+  function fillViews(view, arr){
+      var result="", status ="", activate = "", lang = "{{.user.Device.Language}}";
+      for(var i=0;i<arr.length;i++){
+
+          switch(arr[i]["status"].name){
+              case "init": status = "info", activate = "active-target"; break;
+              case "active": status = "check"; break;
+              case "completed": status = "done_all"; break;
+              default: status = "block"; break;
+          }
+          
+          result += view.replace( new RegExp("\\$.id", 'g'), arr[i]["id"])
+                          .replace(new RegExp("\\$.name", 'g'), arr[i]["title"])
+                          .replace(new RegExp("\\$.description", 'g'), arr[i]["description"])
+                          .replace(new RegExp("\\$.activation", 'g'),  activate)
+                          .replace(new RegExp("\\$.status", 'g'), status);
+      }
+      return result;
+  }
+
+  // Fixed dates and times
+  $(".datepicker.from-now").on("change",function(){
+
+    var myDate = toValidDate($(this).val())
+    var valid, now = new Date();
+
+    now.setHours(0), now.setMinutes(0), now.setSeconds(0),now.setMilliseconds(0); 
+
+    if (myDate < now){
+      $(this).addClass("invalid")
+    }else{
+      $(this).removeClass("invalid"), valid = true
+    }
+
+    if($("#start_date").val()!="" && $("#end_date").val()!=""){
+        myDate = new Date(toValidDate($("#start_date").val()))
+        now = new Date(toValidDate($("#end_date").val()))
+        if (myDate>now){
+          $("#start_date").addClass("invalid"),$("#end_date").addClass("invalid")
+        }else{
+          if(valid){
+            $("#start_date").removeClass("invalid"),$("#end_date").removeClass("invalid")
+            validDates = true
+          }
+        }
+      }
+  });
+
+   // Fix time picker to only half hour and o'clock time
+   $(".timepicker").on("change",function(){
+    var times = $(this).val().split(":");
+    if($(this).attr("intervals") != undefined){
+      var min = $(this).attr("intervals") * Math.round(times[1]/$(this).attr("intervals"));
+      $(this).val(times[0]+":"+ (min==60?"55":min<10?('00'+min).slice(-2):min));
+    }
+  });
+
+  // Active Mission request
+  $(".active-target").on("click", function () {
+
+      var id = $(this).attr("data-id");
+
+      // Send object to endpoint
+      $.ajax({
+          url: "missions/active/" + id,
+          method: "post",
+          beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+                },
+          success: function (result) {
+              alert(result.message);
+              location.reload();
+          },
+          error: function (resp) {
+            try{
+              alert(resp.responseJSON.message)
+              location.reload()
+            }catch(e){console.log(e)}
+          },
+      }); // end ajax
+  });
+
+  // Get Advertisements 
+  _filter_campaign.on("change",function(){
+      // Find advertisements by sponsor
+      $.ajax({
+          url: "/v2/advertisement/all/sp/" + $(this).find(":selected").attr("data-sponsor"),
+          method: "get",
+          beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                },
+          success: function (resp) {
+              if (resp.success && resp.data.length>0)
+              _select_ads.fillValues({datas:filterDataFilters(resp.data,"ad")}),
+              _select_ads.material_select("update");
+          },
+          error: function (err) {
+              console.log(err.responseText)
+          },
+      }); // end ajax
+  });
+
+  _filter_submit.on("click",function(){
+
+    $(".form_campaign").val(_filter_campaign.val());
+
+    // Find missions by campaign
+    $.ajax({
+            url: "missions/campaign/" + _filter_campaign.val(),
+            method: "get",
+            beforeSend: function(request) {
+                    request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    request.setRequestHeader("Accept-Language", "{{.user.Device.Language}}");
+                },
+            success: function (result) {
+              if (result.data.length>0){
+                  $(".row-subs").remove();                    
+                  $(".collection-item").parent().append(fillViews(views._row_mission, result.data));
+                  tableListener();
+              }else{
+                  $(".row-subs").remove()
+              }
+            },
+            error: function (err) {
+                alert(err.responseText)
+            },
+        }); // end ajax
+  })
+
+  // Handle Create New Mission Tab Click
+  $("#t2").on("click",function(){
+    _form_mission.prop("action","/spyc_admin/missions"),
+    _form_mission.find("#cover_picture").addClass("required");
+    setFormFields("new");
+  });
+
+  _form_mission.find(".switch").on("change",function(){
+    if (!$(this).hasClass("on")){
+      $(this).addClass("on"), $(this).removeClass("off");
+      _form_mission.find(".form_r_ads").css({"display":"block"});
+    }else{
+      $(this).addClass("off"), $(this).removeClass("on")
+      _form_mission.find(".form_r_ads").css({"display":"none"});
+    }
+  })
+
+  // Save form 
+  _form_mission.on("submit", function () {
+
+    var acceptFiles = false
+    $('input[type=file]').each(function(){
+      // If has files and files are required
+      if ( $(this).val() == "" && $(this).hasClass("required")){
+        $(this).parent().siblings(".file-path-wrapper").find("input").addClass("invalid");
+      }else{
+        $(this).parent().siblings(".file-path-wrapper").find("input").removeClass("invalid");
+        acceptFiles= true;
+      }
+    })
+
+
+
+    if ( (!acceptFiles || !validDates) && isNew ){ return false; }
+
+  console.log("pass")
+  return false
+    var split = new Date().toString().split(" ");
+    var timeZoneFormatted = split[split.length - 2].substring(3);
+
+    _row_start_time.val(_row_start_time.val() + " "+ timeZoneFormatted);
+    _row_end_time.val(_row_end_time.val() + " "+ timeZoneFormatted);
+
+      if(_form_mission.attr("action").split("/").length <=4) {
+        _form_mission.find(".countries").val(_form_mission.find("#form_r_country").val().toString())
+        _select_ads.val("")
+        return;
+      }
+  });
+
+  function setFormFields(type){
+      isNew = type=="new"?true:false;
+      _form_mission.find("#form_r_country").parent().parent().css({display:type=="new"?"block":"none"}),
+      _form_mission.find("#form_r_campaign").parent().parent().css({display:type=="new"?"block":"none"}),
+      _form_mission.find("#form_r_frequency").parent().parent().css({display:type=="new"?"block":"none"}),
+      _form_mission.find(".pickers").css({display:type=="new"?"block":"none"}),
+      _form_mission.find(".coords").css({display:type=="new"?"block":"none"}),
+      $("#cover_picture").val(""),
+      $("#cover_picture").parent().siblings("div").find("input").val("");
+  }
+
+  function fillFormDetail(mission){
+      _form_mission.find("#title").val(""),
+      _form_mission.find("#form_r_type").val(mission!=""?mission.type:"").material_select(),
+      _form_mission.find("#description").val("");
+  };
+
+  // Handles the table events
+  var tableListener = function(){
+      // Edit Mission click
+      $(".edit-target").on("click", function () {
+
+          var 
+          id = $(this).attr("data-id"),
+          param = {"format":"json"};
+
+          _form_mission.prop("action","/spyc_admin/missions/update/"+id),
+          _form_mission.find("#cover_picture").removeClass("required");
+          setFormFields("edit");
+
+          // Send object to endpoint
+          $.ajax({
+              url: "missions/" + id,
+              method: "get",
+              data: param,
+              beforeSend: function(request) {
+                        request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    },
+              success: function (resp) {
+                  if (resp.success)
+                  fillFormDetail(resp.data),
+                  _modal_detail_mission.modal("open");
+              },
+              error: function (err) {
+                  alert(err)
+              },
+          }); // end ajax
+      });
+
+      //Handle delete function
+      $(".del-target").on("click", function () {
+          var id = $(this).attr("data-id"),
+          row = $(this);
+
+          // Send object to endpoint
+          $.ajax({
+              url: "missions/" + id,
+              method: "delete",
+              success: function (result) {
+                  alert(result.success);
+                  row.closest("li").remove();
+              },
+              error: function (err) {
+                  alert(err.responseText)
+              },
+          }); // end ajax
+      });
+      
+  }
+
+  function validateInputFile(){
+    $('input[type=file][max-size]').each(function(){
+      if(typeof this.files[0] !== 'undefined'){
+        var maxSize = parseInt($(this).attr('max-size'),10),
+        size = this.files[0].size;
+        if(maxSize <= size) return false
+      }
+    });
+    return false
+  }
+  _filter_campaign.trigger("change"), _filter_submit.trigger("click");
+
+</script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key={{.JSapikey}}&callback=myMap" async defer></script> -->
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?libraries=places&sensor=false&key={{.JSapikey}}&callback=myMap"></script>
+
+{{template "dfooter.html" .}}

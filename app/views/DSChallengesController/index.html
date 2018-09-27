@@ -1,0 +1,288 @@
+{{set . "title" "Stats Challenges"}}
+{{template "dheader.html" .}}
+
+<style>
+    span.row-subtitle{
+        color: black;
+    }
+</style>
+
+<div class="row">
+  <div class="col s12 m12">
+    <ul class="tabs">
+      <li class="tab col s3"><a id="t1" class="active" href="#tab1">Rewards List</a></li>
+    </ul>
+  </div>
+
+  <div class="row"></div>
+  <div class="row"></div>
+
+    <!-- Mission list -->
+    <div id="tab1" class="col s12">
+
+        <!-- Filter -->
+        <div class="row col s12 m10 offset-m1">
+            <!--Select of Countries-->
+              <div class="input-field col s6 m3">
+                  <select id="form_r_country" class="form-resource target" name="country">
+                      {{range $m := .Countries}}
+                          <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                      {{end}}
+                  </select>
+                  <label for="desription">Country</label>
+              </div>
+              <!-- Select of Campaigns -->
+            <div class="input-field col s6 m3">
+                    <select id="filter_campaign" class="form-resource target" name="campaign">
+                        {{range $m := .Campaigns}}
+                            <option value="{{$m.ID.Hex}}">{{$m.Name}}</option>
+                        {{end}}
+                    </select>
+                    <label for="campaign">Campaign</label>
+                </div>
+              <!--Select of Target Types-->
+            <div class="input-field col s6 m2">
+                <select class="form_type" name="type">
+                        <option value="" disabled>Select</option>
+                </select>
+                <label for="desription">Type</label>
+            </div>
+            <div class="col s6 m2">
+                <button id="filter_submit" class="btn waves-effect waves-light" type="" name="submit">Search
+                </button>
+            </div>
+        </div>
+        <div class="row"></div>
+
+        <div class="row chart-container">
+            <div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+        </div>
+    </div>
+    
+
+    <div class="JS_main" style="display:none">
+    <script type="text/javascript" src="/public/js/js/canvasjs.min.js"></script>
+    <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+    </div>
+
+<script>
+ 
+  (function(){
+
+    var 
+    _filter_submit = $("#filter_submit"),
+    views = {
+        lineChart : '<div id="chartContainer_$.item" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>'
+    };
+
+    // arrays have objects with the structure
+    // {total:0, year: myDateArr[0], month: j ,day:myDateArr[1]}
+    var sumMonthsValues = function( arr1, arr2){
+        for(var i=0; i< arr2.length;i++){
+            if (arr1.length == 0){
+                arr1 = arr2
+            }else{
+                if( arr1[i].month == arr2[i].month )
+                arr1[i].total = arr1[i].count + arr2[i].total
+            }
+        }
+        return arr1
+    }
+    
+    // Country, types, months, total
+    var filterLineData = function(elems){
+        
+        var 
+        itemsArr = [], arrMonths = [], mapType= new Map(), months={}, total, myDateArr;
+        console.log("DATA Entry")
+        console.log(elems)
+        console.log("------------------")
+
+        // Find distinct status
+        for( var i=0; i<elems.length;i++){
+            if( mapType.get(elems[i].c_type) == undefined ){
+                //monthsContainer[elems[i].c_type]={"months":[]}
+                mapType.set(elems[i].c_type, [])
+            }
+        }
+
+        // Loop throough elem types array
+        var i = 0;
+        mapType.forEach(function (value, key, mapObj) {
+
+            // Loop through elems array
+            for(var i=0; i< elems.length; i++){
+
+                // if both types are equal
+                if( key == elems[i].c_type){
+
+                    // Loop though  months array from main.js to group elems by month
+                    for(var j=0; j< arrMonth["{{.user.Device.Language}}"].length ;j++){
+
+                        myDateArr = elems[i].created_at.split("-");
+
+                        // Initialize arrMonth array
+                        if( typeof arrMonths[j] != "object" ){
+                            arrMonths[j] = {total:0, year: myDateArr[0], month: j ,day:myDateArr[1]}
+                        }
+
+                        // if months match
+                        if( j == myDateArr[1]-1 ){
+                            arrMonths[j].total += elems[i].count
+                        }else{
+                            arrMonths[j] = {total:0, year: myDateArr[0], month: j ,day:myDateArr[1]}
+                        }
+
+                    } // End months loop
+
+                    console.log(arrMonths)
+                    mapType.set( elems[i].c_type, sumMonthsValues( mapType.get( key ), arrMonths) )
+
+                } // end if
+            } // end for
+            i++;
+        });
+
+
+            
+
+
+                
+
+                // add element to map
+                //arrType.set(elems[i].c_type, newArrMonth)
+
+        console.log(itemsArr)
+
+        var newArrMonth = jQuery.extend(true, [], arrMonths);
+
+        //return arrType;
+    }
+
+    _filter_submit.on("click",function(){
+        getStats("challenge")
+    });
+    
+    // Get status by type
+    function getStats(type){
+        $.ajax({
+            url: "f/"+type+"?format=json",
+            method: "get",
+            async: true,
+            beforeSend: function(request) {
+                        request.setRequestHeader("Authorization", "Bearer "+getCookie("atoken"));
+                    },
+            success: function (result) {
+                if (typeof result == 'object' && result.success){
+                    validateResponse(result.data)
+                }
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    }
+
+    // Verifies server response
+    function validateResponse(data){
+        if ( data.length>0 ){
+            var newArr = filterLineData(data);
+            return
+            fillLineData(newArr,"chartContainer");
+        }
+    }
+
+    // Complete This method
+    function fillViews(view, arr, type){
+        switch(type){
+            case "line_chart":
+            for(var i =0; i< arr.length; i++){
+
+            }
+        }
+    }
+
+    getStats();
+
+    // Prepare data to toggleData
+    function setDataPoints(arr){
+        var resp = [];
+        arr.forEach(function(e,i){
+            resp.push({ x: new Date(e.year, e.month, e.day), y: e.total })
+        })
+        return resp;
+    }
+
+    // Prepares data array for chart
+    function setDataChart(arr, lineName, color){
+
+        return {
+            type: "line",
+            showInLegend: true,
+            name: lineName,
+            markerType: "square",
+            xValueFormatString: "DD MMM, YYYY",
+            color: arrColors[color],
+            dataPoints: setDataPoints(arr)
+        }
+   
+    }
+
+    // elem is the html element ID, name is the line name
+    function fillLineData(mapArr, elem){
+        var newArray = [], i=0;
+        mapArr.forEach(function (value, key, mapObj) {
+            newArray.push(setDataChart(value,key,i)),
+            i++;
+        });
+
+        var chart = new CanvasJS.Chart( elem , {
+                animationEnabled: true,
+                theme: "light2",
+                title:{
+                    text: "Challenges"
+                },
+                axisX:{
+                    valueFormatString: "DD MMM",
+                    crosshair: {
+                        enabled: true,
+                        snapToDataPoint: true
+                    }
+                },
+                axisY: {
+                    title: "Total",
+                    crosshair: {
+                        enabled: true
+                    }
+                },
+                toolTip:{
+                    shared:true
+                },  
+                legend:{
+                    cursor:"pointer",
+                    verticalAlign: "bottom",
+                    horizontalAlign: "left",
+                    dockInsidePlotArea: true,
+                    itemclick: toogleDataSeries
+                },
+                data: newArray
+            });
+
+            chart.render(),$(".canvasjs-chart-container").css({"position": "absolute"});
+    }
+
+    function toogleDataSeries(e){
+        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+        } else{
+            e.dataSeries.visible = true;
+        }
+        chart.render();
+    }
+  })();
+
+    
+
+</script>
+
+{{template "dfooter.html" .}}

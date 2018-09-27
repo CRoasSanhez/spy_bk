@@ -1,0 +1,297 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+module:testrunner
+
+# GET     /                                       App.Index
+
+# Routes for Ejabberd stateless mode
+GET     /ejabberd/auth                          SaasController.Auth
+GET     /ejabberd/user                          SaasController.User
+POST    /ejabberd/archive                       SaasController.Archive
+
+
+# Ignore favicon requests
+# GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/*filepath                       Static.Serve("public")
+
+# CRYPTO
+# GET     /crypt                                  App.CryptData
+# GET     /decrypt                                App.DecryptData
+GET     /v2/replicate_stats                          StatsController.Replicate
+
+
+
+
+
+# ------------------------------------------------------------------------------
+# Routes for version 2
+
+# JOBS MONITORING
+module:jobs
+
+# Users routes
+GET     /v2/users/:id                              UsersController.Show
+POST    /v2/users                                  UsersController.Create
+
+POST    /v2/verify_account                         UsersController.VerifyUserName
+POST    /v2/reset_password                         UsersController.ResetPassword
+
+# Profile
+GET     /v2/profile                                UsersController.Index
+PATCH   /v2/profile                                UsersController.Update
+PATCH   /v2/profile/picture                        UsersController.ProfilePicture
+PATCH   /v2/profile/location                       UsersController.Coords
+PATCH   /v2/profile/messaging_token                UsersController.MessagingToken
+PATCH   /v2/profile/language                       UsersController.Language
+PATCH   /v2/profile/username                       UsersController.ChangeUsername
+DELETE  /v2/profile                                UsersController.Delete
+
+# Friends
+GET     /v2/friends                                UsersController.Friends
+POST    /v2/friends/new_request                    UsersController.FriendRequest
+
+# Sessions routes
+POST    /v2/sessions                               SessionsController.Create
+
+# Missions routes
+GET     /v2/games/:id                              MissionsController.Show
+GET     /v2/all/games                              MissionsController.ShowAllMissions
+GET     /v2/games                                  MissionsController.GetSubscribedMissions
+POST    /v2/games/geo                              MissionsController.ShowMissionsByLocation
+POST    /v2/games/:id/subscribe                    MissionsController.SubscribeToMission
+POST    /v2/games/:id/unsubscribe                  MissionsController.UnsubscribeFromMission
+PATCH   /v2/games/:id/ad                           MissionsController.AddUserView
+
+# WebGames routes
+GET     /v2/webgames                               WebGamesController.GetWebGames
+POST    /v2/webgames/cshnt/start                   WebGamesController.StartWebGame
+POST    /v2/webgames/cshnt/validate                WebGamesController.ValidateWebGame
+PUT     /v2/webgames/cshnt                         WebGamesController.UpdateWebGameScore
+GET     /v2/webgames/:idTarget/status              WebGamesController.GetWebGameStatus
+GET     /v2/webgames/chat/:id                      ChallengesController.GetChallengeInfo
+POST    /v2/webgames/chat/start                    ChallengesController.StartChallenge
+POST    /v2/webgames/chat/validate                 ChallengesController.ValidateChallenge
+PUT     /v2/webgames/chat                          ChallengesController.UpdateChallengeScore
+GET     /v2/games/images/:gameType/:size           ImagesController.GetResource
+
+# Rewards routes
+POST    /v2/rewards/collect/:id                    RewardsController.CollectReward
+GET     /v2/rewards/:page                          RewardsController.GetRewards
+
+# Sanctions routes
+POST    /v2/sanctions/:sanctionType/:userID         SanctionsController.SactionUser
+
+# Targets routes
+GET     /v2/steps/:id                              TargetsController.Show
+POST    /v2/steps/:id/subscribe                    TargetsController.SubscribeToTarget
+POST    /v2/steps/:id/unsubscribe                  TargetsController.UnsubscribeFromTarget
+GET     /v2/steps/:idMission/current               TargetsController.GetCurrentTargetByMissionID
+
+#Validate Target Answer or Getting WebGame Info
+POST    /v2/validate/:idMission/:idTarget/:data    TargetsController.ValidateReward
+
+# Search routes
+GET     /v2/time/:format                           SearchController.TimeFormat
+POST    /v2/search/people                          SearchController.GetPeople
+POST    /v2/search/users                           SearchController.Search
+POST    /v2/invite                                 SearchController.InvitePeople
+
+# Challenges
+POST    /v2/challs                                 ChallengesController.CreateChallenge
+POST    /v2/challs/:id/upload                      ChallengesController.SaveChallengeFile
+POST    /v2/challs/:id/notify                      ChallengesController.NotifyChallengePlayers
+GET     /v2/challs/:id/status/:idPlayer            ChallengesController.GetChallengePlayerStatus
+GET     /v2/challs/:id/status                      ChallengesController.GetChallengeUserStatus
+GET     /v2/challs/status/:id                      ChallengesController.GetChallengeStatus
+DELETE  /v2/challs/:id                             ChallengesController.Delete
+
+# Chest routes
+GET     /v2/chests/:id                             ChestsController.Show
+POST    /v2/chests/:id/unlock                      ChestsController.Unlock
+POST    /v2/chests/:id/lock                        ChestsController.Lock
+PUT     /v2/chests/:id/files                       ChestsController.AddFile
+DELETE  /v2/chests/:id/files                       ChestsController.RemoveFile
+POST    /v2/chests/search                          ChestsController.Search
+POST    /v2/chests                                 ChestsController.Create
+
+# Coins Transaction routes
+POST    /v2/coins                                  CoinsController.SendTransaction
+
+# SMS
+POST    /v2/request_verification                   SMSController.RequestNew
+POST    /v2/validate_account                       SMSController.VerifySMS
+
+# MAPS
+GET     /v2/maps/:id                               MapsController.Show
+POST    /v2/maps                                   MapsController.Create
+
+# Notifications
+GET     /v2/notifications                          NotificationsController.Index
+PATCH   /v2/notifications/received                 NotificationsController.MarkAsReceived
+PATCH   /v2/notifications/:id/seen                 NotificationsController.MarkAsSeen
+PATCH   /v2/notifications/:id/completed            NotificationsController.MarkAsCompleted
+
+# Messages
+POST    /v2/messages/files                         MessagesController.UploadFile
+
+# Invites
+GET     /v2/invitations                            InvitesController.Index
+POST    /v2/invitations/:id/respond                InvitesController.Respond
+
+# Ejabberd
+GET     /v2/ejabberd/group                         EjabberdController.Index
+GET     /v2/ejabberd/group/:id                     EjabberdController.Show
+PATCH   /v2/ejabberd/group/:id                     EjabberdController.Update
+POST    /v2/ejabberd/group/:id/members             EjabberdController.AddMember
+PATCH   /v2/ejabberd/group/:id/members/:jid        EjabberdController.UpdateMember
+DELETE  /v2/ejabberd/group/:id/members/:jid        EjabberdController.RemoveMember
+POST    /v2/ejabberd/group                         EjabberdController.Create
+
+# Spy News
+GET     /v2/spy_news                               SpyNewsController.Index
+POST    /v2/spy_news                               SpyNewsController.Create
+POST    /v2/spy_news/:id/comments                  SpyNewsController.Comment
+PUT     /v2/spy_news/:id/reactions                 SpyNewsController.React
+
+# Stats
+GET     /v2/stats                                  StatsController.Index
+
+# Blacklist
+GET     /v2/blacklist                              BlacklistController.Blacklist
+POST    /v2/blacklist                              BlacklistController.AddToBlackList
+POST    /v2/users/:jid/blacklist                              BlacklistController.AddToBlackList
+DELETE  /v2/blacklist                              BlacklistController.RemoveFromBlacklist
+
+# Saas
+GET     /v2/saas/:jid/info                          V2SaasController.Info
+
+# Sections
+POST    /v2/sections                                      SectionsController.Create
+POST    /v2/sections/:id/replicate                        SectionsController.Replicate
+GET     /v2/sections/:section/info                        SectionsController.Info
+POST    /v2/sections/:section/notify_advertisement_seen   SectionsController.NotifyAdvertisingSeen
+
+# Advertisement
+POST    /v2/advertisement                           AdvertisementController.Create
+PATCH   /v2/advertisement/:id/attachment            AdvertisementController.UploadAttachment
+GET     /v2/advertisement/all/sp/:idSponsor         AdvertisementController.GetAdvertisementsBySponsor
+
+# PinAdvertisement
+GET     /v2/pin_advertisements                      PINController.Index
+POST    /v2/pin_advertisements                      PINController.Create
+PATH    /v2/pin_advertisements                      PINController.Update
+PATCH   /v2/pin_advertisements/:id/clicked          PINController.PinClicked
+PATCH   /v2/pin_advertisements/:id/viewed           PINController.PinViewed
+
+# Histories
+GET     /v2/histories                               HistoriesController.Index
+POST    /v2/histories                               HistoriesController.Create
+PATCH   /v2/histories/:id/seen                      HistoriesController.AddView
+
+
+
+
+
+# ------------------------------------------------------------------------------
+# Dashboard routes .....
+
+# Dashboard
+GET       /spyc_admin                                          DashboardController.Index
+
+POST      /spyc_admin/users                                    DUsersController.Create
+
+# AppPaths
+GET      /spyc_admin/app_paths                                 DAppPathsController.Index
+GET      /spyc_admin/app_paths/:id                             DAppPathsController.Show
+POST     /spyc_admin/app_paths                                 DAppPathsController.Create
+PATCH    /spyc_admin/app_paths/:id                             DAppPathsController.Update
+DELETE   /spyc_admin/app_paths                                 DAppPathsController.Delete
+
+# Basic CashHunt
+GET      /spyc_admin/cashhunt                                  DCashHuntController.Index
+POST     /spyc_admin/cashhunt                                  DCashHuntController.Create
+POST     /spyc_admin/cashhunt/:idMission/:idTarget/picture     DCashHuntController.Picture
+
+# Campaigns
+GET       /spyc_admin/campaigns                                DCampaignsController.Index
+GET       /spyc_admin/campaigns/:id                            DCampaignsController.Show
+DELETE    /spyc_admin/campaigns/:id                            DCampaignsController.Delete
+POST      /spyc_admin/campaigns/:sponsorID                     DCampaignsController.Create
+POST      /spyc_admin/campaigns/active/:id                     DCampaignsController.ActivateCampaign
+GET       /spyc_admin/campaigns/sponsor/:sponsorID             DCampaignsController.GetCampaignsBySponsor
+
+# Missions
+GET       /spyc_admin/missions                                 DMissionsController.Index
+GET       /spyc_admin/missions/new                             DMissionsController.New
+POST      /spyc_admin/missions                                 DMissionsController.Create
+GET       /spyc_admin/missions/:id                             DMissionsController.Show
+POST      /spyc_admin/missions/update/:id                      DMissionsController.Update
+DELETE    /spyc_admin/missions/:id                             DMissionsController.Delete
+POST      /spyc_admin/missions/active/:id                      DMissionsController.ActivateMission
+GET       /spyc_admin/missions/campaign/:idCampaign            DMissionsController.GetMissionsByCampaign
+
+#Add Question to Target
+POST      /spyc_admin/questions/:idTarget                      DTargetsController.AddQuestion
+
+# Rewards
+GET       /spyc_admin/rewards                                  DRewardsController.Index
+POST      /spyc_admin/rewards                                  DRewardsController.Create
+GET       /spyc_admin/rewards/:id                              DRewardsController.Show
+POST      /spyc_admin/rewards/update/:id                       DRewardsController.Update
+POST      /spyc_admin/rewards/active/:id                       DRewardsController.ActivateReward
+DELETE    /spyc_admin/rewards/:id                              DRewardsController.Delete
+
+# Sessions
+GET       /spyc_admin/sessions/new                             DSessionsController.New
+POST      /spyc_admin/sessions                                 DSessionsController.Create
+GET       /spyc_admin/logout                                   DSessionsController.Delete
+
+# Sponsors
+GET       /spyc_admin/sp                                       DSponsorsController.Index
+POST      /spyc_admin/sp                                       DSponsorsController.Create
+PATCH     /spyc_admin/sp/:id                                   DSponsorsController.Update
+GET       /spyc_admin/sp/:id                                   DSponsorsController.Show
+DELETE    /spyc_admin/sp/:id                                   DSponsorsController.Delete
+POST      /spyc_admin/sp/active/:id                            DSponsorsController.ActivateSponsor
+
+# Targets
+GET       /spyc_admin/targets/:id                              DTargetsController.Show
+GET       /spyc_admin/targets/qr/:id                           DTargetsController.GenerateQR
+POST      /spyc_admin/targets/:missionID                       DTargetsController.Create
+DELETE    /spyc_admin/targets/:id                              DTargetsController.Delete
+POST      /spyc_admin/targets/update/:id                       DTargetsController.Update
+
+GET       /spyc_admin/targets/game/:id                         DTargetsController.GetTargetsByMission
+POST      /spyc_admin/targets/order/:idMission                 DTargetsController.UpdateTargetsOrder
+
+# Users
+GET       /spyc_admin/users                                    DUsersController.Index
+GET       /spyc_admin/users/:id                                DUsersController.Show
+GET       /spyc_admin/reset_password                           DUsersController.ResetPassword
+GET       /spyc_admin/password_success                         DUsersController.ResetPasswordSuccess
+POST      /spyc_admin/change_password                          DUsersController.ChangePassword
+
+# Validation of targets mannually
+GET       /spyc_admin/validation                               DTargetsController.Validation
+GET       /spyc_admin/validation/:idTarget                     DTargetsController.GetSubscriptionsByTarget
+POST      /spyc_admin/validation/:idMission/:idSubscription    DTargetsController.Validate
+
+# WebGames
+GET       /spyc_admin/webgames                                 DGamesController.Index
+GET       /spyc_admin/webgames/:id                             DGamesController.Show
+POST      /spyc_admin/webgames/update/:id                      DGamesController.Update
+POST      /spyc_admin/webgames                                 DGamesController.Create
+POST      /spyc_admin/webgames/activate/:id                    DGamesController.ActivateGame
+DELETE    /spyc_admin/webgames/:id                             DGamesController.Delete
+
+
+# ------------------------------------------------------------------------------
+# Stats Dashboard routes .....
+
+# Challenges
+GET     /spyc_admin/stats/challenges                           DSChallengesController.Index
+GET     /spyc_admin/stats/f/:statstype                         DSChallengesController.GetStats

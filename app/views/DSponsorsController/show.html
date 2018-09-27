@@ -1,0 +1,247 @@
+{{set . "title" "Sponsor Detail"}} {{template "dheader.html" .}}
+<div class="row">
+    <div class="col s12 m6 offset-m3">
+        <div class="label">
+            <h4>Sponsor Detail</h4>
+        </div>
+        <input type="hidden" name="_token" value="">
+        <div class="form-group">
+            <div class="controls">
+                <label for="title">Name</label>
+                <input id="title" type="text" class="form-control" name="title" value="{{.Sponsor.Name}}" disabled>
+                
+            </div>
+        </div>
+        <!--
+        <div class="row">
+            <img class="materialboxed" width="650" src="{{.Reward.ImageID}}">
+        </div>
+        -->
+
+        <div class="row">
+            <div class="col s12 m12">
+                <ul class="collection with-header">
+                    <li class="collection-header">
+                        <h4>Campaigns
+                            <a id="show_modal" href="#" data-target="#show_modal" class="secondary-content" data-toggle="modal" >
+                                <i class="material-icons">add</i></a>
+                        </h4>
+                    </li>
+                    <li class="collection-item">
+                        <div>
+                            <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                            <a>Name</a>
+                            <a class="secondary-content">Options</a>
+                            <a class="secondary-content">&nbsp;&nbsp;&nbsp;</a>
+                            <a class="secondary-content">Type</a>
+                        </div>
+                    </li>
+                    {{range $m := .Campaigns }} 
+                        {{if ne $m.Status.Name "inactive" }}
+                        <li class="collection-item">
+                            <div>
+                                {{if eq $m.Status.Name "init" }}
+                                <a href="#" class="active-target" data-id="{{$m.ID.Hex}}"><i class="material-icons">info</i></a>                            
+                                {{end}} 
+                                {{if eq $m.Status.Name "active" }}
+                                <a href="#"><i class="material-icons">check</i></a> 
+                                {{end}} 
+                                {{if eq $m.Status.Name "inactive"}}
+                                <a href="#" class="active-target" data-id="{{$m.ID.Hex}}"><i class="material-icons">block</i></a> 
+                                {{end}} 
+                                {{if eq $m.Status.Name "completed"}}
+                                <a href="#"><i class="material-icons">done_all</i></a> 
+                                {{end}}
+                                <a href="../campaigns/{{$m.ID.Hex}}">{{$m.Name}}</a>
+                                <a href="#" class="del-target secondary-content" data-id="{{$m.ID.Hex}}"><i class="material-icons">close</i></a>
+                                <a class="edit-target secondary-content" data-id="{{$m.ID.Hex}}"><i class="material-icons">edit</i></a>
+                            </div>
+                        </li>
+                        {{end}} 
+                   {{end}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Campaign Detail -->
+<div id="modal_detail" class="modal modal-fixed-footer">
+    <form id="sponsor_form" class="col s12 m12" action="../campaigns/{{.Sponsor.ID.Hex}}" method="post" enctype="form-data">
+        <div class="modal-content">
+            <h4>Campaign</h4>
+            <div class="row">
+                <div class="row">
+                    <div class="input-field col s12 m8">
+                        <input id="title" type="text" class="validate" name="name" required>
+                        <label for="title">Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 m8">
+                        <input id="budget" type="number" class="validate" name="budget" required>
+                        <label for="title">Budget</label>
+                    </div>
+                </div>
+                <!--DATETIME FIELDS-->
+                <div class="row">
+                    <div class="controls col s6 m6">
+                        <label for="start_date">Start Date</label>
+                        <input id="start_date" type="text" class="datepicker" name="start_date" minlength="6" required="false">
+                    </div>
+                    <div class="controls col s6 m6">
+                        <label for="end_date">End Date</label>
+                        <input id="end_date" type="text" class="datepicker" name="end_date" minlength="6" required="false">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+            <button id="submit" class="btn waves-effect waves-light" type="submit" name="submit">Enviar
+            <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="JS_main" style="display:none">
+  <script type="text/javascript" src="/public/js/js/main.min.js"></script>
+</div>
+
+<script>
+    //(function($){
+
+    var 
+    _modal_detail = $("#modal_detail"),
+    _form_target = $("#sponsor_form"),
+    _btn_submit = $("#submit");
+
+    $(document).ready(function () {
+
+        // Init image preview
+        $('.materialboxed').materialbox();
+    });
+
+    // Active Sponsor request
+    $(".active-target").on("click", function () {
+
+        var id = $(this).attr("data-id");
+
+        // Send object to endpoint
+        $.ajax({
+            url: "../campaigns/active/" + id,
+            method: "post",
+            success: function (result) {
+                alert(result);
+                location.reload();
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Edit Campaign click
+    $(".edit-target").on("click", function () {
+
+        var 
+        id = $(this).attr("data-id"),
+        param = {"format":"json"};
+
+        _form_target.prop("action","/spyc_admin/sp/"+id);
+        _form_target.prop("method","patch");
+        _btn_submit.attr("data-id",id);
+
+
+        setFormFields("edit");
+
+        // Get Target Detail
+        $.ajax({
+            url: "../campaigns/" + id,
+            method: "get",
+            data: param,
+            success: function (resp) {
+                if (typeof resp == "object" && resp.success){
+                    fillFormDetail(resp.data),
+                    _modal_detail.modal("open");
+                }  
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Save form 
+    _btn_submit.on("click", function () {
+
+        var 
+        url = "", method = "", id = $(this).attr("data-id");
+
+        if(_form_target.prop("method")== "post") {
+            url = "/spyc_admin/sp/", method = "post";
+            return;
+        }else{
+            url = "/spyc_admin/sp/"+id, method = "patch";
+        }
+        
+        // Send object to endpoint
+        $.ajax({
+            url: url,
+            method: method,
+            data: _form_target.serialize(),
+            success: function (resp) {
+                location.reload();
+            },
+            error: function (err) {
+                console.log(err.responseText)
+            },
+        }); // end ajax
+        return false
+    });
+
+    //Handle delete function
+    $(".del-target").on("click", function () {
+        var id = $(this).attr("data-id");
+
+        // Send object to endpoint
+        $.ajax({
+            url: "../campaigns/" + id,
+            method: "delete",
+            success: function (result) {
+                alert(result.message);
+                //$("#modal_question_detail").modal("close");
+                location.reload();
+            },
+            error: function (err) {
+                alert(err)
+            },
+        }); // end ajax
+    });
+
+    // Hadle show Question modal
+    $("#show_modal").on("click",function(){
+        setFormFields("new");
+        $("#modal_detail").modal("open");
+    });
+
+    function setFormFields(type){
+        if (type == "edit"){
+            _form_target.find("#budget").closest(".row").css({"display":"none"})
+            _form_target.find("#start_date").parent().css({"display":"none"})
+            _form_target.find("#end_date").parent().css({"display":"none"})
+        }else{
+            _form_target.find("#budget").closest(".row").css({"display":"block"})
+            _form_target.find("#start_date").parent().css({"display":"block"})
+            _form_target.find("#end_date").parent().css({"display":"block"})
+        }
+        
+    };
+
+    function fillFormDetail(target){
+        _form_target.find("#title").val(target!=""?target.name:"");
+    };
+
+</script>
+{{template "dfooter.html" .}}
